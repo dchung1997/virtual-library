@@ -2,11 +2,14 @@ package com.example.virtuallibrary.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.example.virtuallibrary.exceptions.BookIdMismatchException;
 import com.example.virtuallibrary.exceptions.BookNotFoundException;
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.repository.BookRepository;
 
+@Service
 public class BookService {
     
     private final BookRepository bookRepository;

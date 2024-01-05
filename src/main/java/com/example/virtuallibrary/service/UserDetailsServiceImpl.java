@@ -1,13 +1,10 @@
 package com.example.virtuallibrary.service;
 
-import java.util.Optional;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
 import com.example.virtuallibrary.exceptions.UserIdMismatchException;
 import com.example.virtuallibrary.exceptions.UserNotFoundException;
@@ -15,6 +12,7 @@ import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.models.UserDetailsImpl;
 import com.example.virtuallibrary.repository.UserRepository;
 
+@Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     
     private final UserRepository userRepository;
