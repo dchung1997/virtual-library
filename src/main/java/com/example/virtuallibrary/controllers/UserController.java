@@ -36,20 +36,20 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody User book) {
-        return userDetailsService.createUser(book);
+    public User createUser(@RequestBody User user) {
+        return userDetailsService.createUser(user);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')" + " || " + "@UserDetailsService.hasId(#id)")
     public void deleteUser(@PathVariable Long id) {
         userDetailsService.deleteUser(id);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')" + " || " + "@UserDetailsService.hasId(#id)")
-    public User updateUser(@RequestBody User book, @PathVariable Long id) {
-        return userDetailsService.updateUser(book, id);
+    public User updateUser(@RequestBody User user, @PathVariable Long id) {
+        return userDetailsService.updateUser(user, id);
     }
 
 

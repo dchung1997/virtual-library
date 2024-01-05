@@ -32,8 +32,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
           .orElseThrow(UserNotFoundException::new);
     }
 
-    public User createUser(User book) {
-        return userRepository.save(book);
+    public User createUser(User user) {
+        return userRepository.save(user);
     }
 
     public void deleteUser(Long id) {
@@ -42,13 +42,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.deleteById(id);
     }
 
-    public User updateUser(User book, Long id) {
-        if (book.getId() != id) {
+    public User updateUser(User user, Long id) {
+        if (user.getId() != id) {
           throw new UserIdMismatchException();
         }
         userRepository.findById(id)
           .orElseThrow(UserNotFoundException::new);
-        return userRepository.save(book);
+        return userRepository.save(user);
     }
 
 
