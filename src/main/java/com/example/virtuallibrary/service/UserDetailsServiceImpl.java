@@ -2,11 +2,15 @@ package com.example.virtuallibrary.service;
 
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import com.example.virtuallibrary.exceptions.UserIdMismatchException;
+import com.example.virtuallibrary.exceptions.UserNotFoundException;
 import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.models.UserDetailsImpl;
 import com.example.virtuallibrary.repository.UserRepository;
@@ -18,6 +22,35 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
+    public Iterable findAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User findUserById(Long id) {
+        return userRepository.findById(id)
+          .orElseThrow(UserNotFoundException::new);
+    }
+
+    public User createUser(User book) {
+        return userRepository.save(book);
+    }
+
+    public void deleteUser(Long id) {
+        userRepository.findById(id)
+          .orElseThrow(UserNotFoundException::new);
+        userRepository.deleteById(id);
+    }
+
+    public User updateUser(User book, Long id) {
+        if (book.getId() != id) {
+          throw new UserIdMismatchException();
+        }
+        userRepository.findById(id)
+          .orElseThrow(UserNotFoundException::new);
+        return userRepository.save(book);
+    }
+
 
     public boolean hasId(Long id) {
       String username =  ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
