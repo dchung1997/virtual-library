@@ -37,10 +37,9 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
-
 		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -54,11 +53,16 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>		
+		<dependency>
     		<groupId>io.rest-assured</groupId>
     		<artifactId>rest-assured</artifactId>
     		<scope>test</scope>
 		</dependency>
-	</dependencies>
+ </dependencies>
 
 	<build>
 		<plugins>
