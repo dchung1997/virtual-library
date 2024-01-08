@@ -12,26 +12,24 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <title>Login</title>
-  </head>
-  <body>
-    <div th:replace="~{fragments :: navbar}"></div>
-    <main class="form w-100 m-auto shadow">
-      <form action="/login" th:object="${user}" method="POST" enctype="utf8">
-        <h1 class="mb-4 text-center">Login</h1>
-        <h2 class="h3 mb-3 fw-normal">Please sign in</h2>
-        <div class="form-floating">
-          <input class="form-control" th:field="*{username}" placeholder="BobbyTables">
-          <label for="username">Username</label>
-        </div>
-        <div class="form-floating">
-          <input type="password" class="form-control" th:field="*{password}" placeholder="Password">
-          <label for="password">Password</label>
-        </div>
-        <span class="referrer-link">Don't have an account? Click here to <a href="/register">Sign up</a></span>        
-        <button class="btn btn-primary w-100 py-2" type="submit">Login</button>
-      </form>
-    </main>
+    <title>Register</title>
+</head>
+<body>
+  <div th:replace="~{fragments :: navbar}"></div>
+  <main class="form w-100 m-auto shadow">
+    <form action="/register/submit" th:object="${user}" method="POST" enctype="utf8">
+      <h1 class="mb-4 text-center">Register</h1>
+      <div class="form-floating">
+        <input class="form-control" th:field="*{username}" placeholder="BobbyTables">
+        <label for="username">Username</label>
+      </div>
+      <div class="form-floating">
+        <input type="password" class="form-control" th:field="*{password}" placeholder="Password">
+        <label for="password">Password</label>
+      </div>
+      <span class="referrer-link">Already have an account? Click here to <a href="/login">Sign in</a></span>        
+      <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
+    </form>
+  </main>
 
-  </body>
-</html>
+</body>

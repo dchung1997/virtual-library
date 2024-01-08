@@ -34,12 +34,6 @@ public class UserController {
         return userDetailsService.findUserById(id);
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public User createUser(@RequestBody User user) {
-        return userDetailsService.createUser(user);
-    }
-
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')" + " || " + "@UserDetailsService.hasId(#id)")
     public void deleteUser(@PathVariable Long id) {

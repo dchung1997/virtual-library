@@ -1,11 +1,14 @@
 package com.example.virtuallibrary.service;
 
+import java.util.Arrays;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.example.virtuallibrary.exceptions.UserAlreadyExistsException;
 import com.example.virtuallibrary.exceptions.UserIdMismatchException;
 import com.example.virtuallibrary.exceptions.UserNotFoundException;
 import com.example.virtuallibrary.models.User;
@@ -31,6 +34,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public User createUser(User user) {
+        if (userRepository.existsByUsername(user.getUsername())) {
+          throw new UserAlreadyExistsException();
+        }
+        // user.setRoles(Arrays.asList("ROLE_USER"));
+
         return userRepository.save(user);
     }
 
