@@ -1,5 +1,6 @@
 package com.example.virtuallibrary.models;
 
+import java.util.Collection;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -24,8 +25,8 @@ public class User {
     private String password;
 
     @ManyToMany    
-    private Set<Role> roles;
-    
+    private Collection<Role> roles;
+        
     private boolean enabled;    
 
     public User() {
@@ -71,11 +72,11 @@ public class User {
         this.enabled = enabled;
     }
 
-    public Set<Role> getRoles() {
+    public Collection<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Collection<Role> roles) {
         this.roles = roles;
     }
 

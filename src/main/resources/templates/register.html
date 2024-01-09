@@ -17,7 +17,7 @@
 <body>
   <div th:replace="~{fragments :: navbar}"></div>
   <main class="form w-100 m-auto shadow">
-    <form action="/register/submit" th:object="${user}" method="POST" enctype="utf8">
+    <form action="/register" th:object="${user}" method="POST" enctype="utf8">
       <h1 class="mb-4 text-center">Register</h1>
       <div class="form-floating">
         <input class="form-control" th:field="*{username}" placeholder="BobbyTables">

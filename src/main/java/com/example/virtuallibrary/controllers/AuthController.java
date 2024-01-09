@@ -30,9 +30,9 @@ public class AuthController {
         return modelAndView; // Return the login form view
     }
 
-    // @PostMapping("/login/submit")
+    // @PostMapping("/login")
     // public ModelAndView loginUserAccount(@ModelAttribute("user") User user) {
-        
+    //     // Make a call to service and see if it fails.
 
     // }    
     
@@ -44,10 +44,11 @@ public class AuthController {
         return modelAndView;
     }
 
-    @PostMapping("/register/submit")
+    @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ModelAndView registerUserAccount(@ModelAttribute("user") User user) {
         // TODO: Add validation.
+        System.out.println("User register has been called for: " + user.getUsername());
         try {
             User registered = userDetailsService.createUser(user);
         } catch (UserAlreadyExistsException uaeEx) {

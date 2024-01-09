@@ -1,11 +1,17 @@
 package com.example.virtuallibrary.service;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.virtuallibrary.exceptions.UserAlreadyExistsException;
@@ -13,15 +19,21 @@ import com.example.virtuallibrary.exceptions.UserIdMismatchException;
 import com.example.virtuallibrary.exceptions.UserNotFoundException;
 import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.models.UserDetailsImpl;
+import com.example.virtuallibrary.repository.RoleRepository;
 import com.example.virtuallibrary.repository.UserRepository;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
     
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
 
-    public UserDetailsServiceImpl(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public UserDetailsServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Iterable findAllUsers() {
@@ -37,7 +49,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (userRepository.existsByUsername(user.getUsername())) {
           throw new UserAlreadyExistsException();
         }
-        // user.setRoles(Arrays.asList("ROLE_USER"));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER")));
 
         return userRepository.save(user);
     }
@@ -71,6 +84,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
+  
         return new UserDetailsImpl(user);
     }
     
