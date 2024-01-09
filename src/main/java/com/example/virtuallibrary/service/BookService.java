@@ -2,6 +2,7 @@ package com.example.virtuallibrary.service;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.virtuallibrary.exceptions.BookIdMismatchException;
@@ -12,11 +13,8 @@ import com.example.virtuallibrary.repository.BookRepository;
 @Service
 public class BookService {
     
-    private final BookRepository bookRepository;
-
-    public BookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }    
+    @Autowired
+    private BookRepository bookRepository;
 
     public Iterable findAllBooks() {
         return bookRepository.findAll();
