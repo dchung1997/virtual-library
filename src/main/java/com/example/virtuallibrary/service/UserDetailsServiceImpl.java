@@ -1,12 +1,6 @@
 package com.example.virtuallibrary.service;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -43,6 +37,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public User findUserById(Long id) {
         return userRepository.findById(id)
           .orElseThrow(UserNotFoundException::new);
+    }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
     public User createUser(User user) {
