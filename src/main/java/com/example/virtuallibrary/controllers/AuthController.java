@@ -41,7 +41,7 @@ public class AuthController {
     public ModelAndView loginUserAccount(@ModelAttribute("user") User user) {
         // Make a call to service and see if it fails.
         try {
-            Authentication authenticationRequest = UsernamePasswordAuthenticationToken.unauthenticated(user.getUsername(), user.getPassword());
+            Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
             Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
             SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
         } catch (BadCredentialsException  bdcdEx) {
@@ -65,16 +65,13 @@ public class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     public ModelAndView registerUserAccount(@ModelAttribute("user") User user) {
         // TODO: Add validation.
-        System.out.println(user.getPassword());
+        String username = user.getUsername();
+        String password = user.getPassword();
         try {
             User registered = userDetailsService.createUser(user);
-            // TODO:Redirect and set context on register.
-            // if (userDetailsService.existsByUsername(user.getUsername())) {
-            //     System.out.println("Wow");
-            //     Authentication authenticationRequest = UsernamePasswordAuthenticationToken.unauthenticated(user.getUsername(), user.getPassword());
-            //     Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
-            //     SecurityContextHolder.getContext().setAuthentication(authenticationResponse);          
-            // }
+            Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(username, password);
+            Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
+            SecurityContextHolder.getContext().setAuthentication(authenticationResponse);          
         } catch (UserAlreadyExistsException uaeEx) {
             ModelAndView modelAndView = new ModelAndView("register", "user", user);
             modelAndView.addObject("message", "An account with that username already exists");
@@ -85,7 +82,7 @@ public class AuthController {
         }
 
 
-        return new ModelAndView("login");
+        return new ModelAndView("home", "user", user);
     }
     
 }
