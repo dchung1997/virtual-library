@@ -44,13 +44,16 @@ public class AuthController {
             Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
             Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
             SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
-        } catch (BadCredentialsException  bdcdEx) {
+        } catch (BadCredentialsException bdcdEx) {
             ModelAndView modelAndView = new ModelAndView("login", "user", user);
             modelAndView.addObject("message", "Invalid Username or Password.");          
+            return modelAndView;
         } catch (RuntimeException ex) {
-            return new ModelAndView("login", "user", user);
+            ModelAndView modelAndView = new ModelAndView("login", "user", user);
+            modelAndView.addObject("message", "An unknown error has occurred.");          
+            return modelAndView;
         }
-        return new ModelAndView("home", "user", user);
+        return new ModelAndView("redirect:/home");
     }    
     
     @GetMapping("/register")
@@ -71,18 +74,16 @@ public class AuthController {
             User registered = userDetailsService.createUser(user);
             Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(username, password);
             Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
-            SecurityContextHolder.getContext().setAuthentication(authenticationResponse);          
+            SecurityContextHolder.getContext().setAuthentication(authenticationResponse);        
         } catch (UserAlreadyExistsException uaeEx) {
             ModelAndView modelAndView = new ModelAndView("register", "user", user);
             modelAndView.addObject("message", "An account with that username already exists");
             return modelAndView;
         } catch (RuntimeException ex) {
-            System.out.println(ex.getMessage());
             return new ModelAndView("register", "user", user);
         }
 
-
-        return new ModelAndView("home", "user", user);
+        return new ModelAndView("home");
     }
     
 }
