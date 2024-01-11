@@ -30,7 +30,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Iterable findAllUsers() {
+    public Iterable<User> findAllUsers() {
         return userRepository.findAll();
     }
 

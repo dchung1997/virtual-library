@@ -16,16 +16,16 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
-    public Iterable findAllBooks() {
+    public Iterable<Book> findAllBooks() {
         return bookRepository.findAll();
     } 
 
-    public List findByTitle(String bookTitle) {
+    public List<Book> findByTitle(String bookTitle) {
         return bookRepository.findByTitle(bookTitle);
     }
 
-    public Book findById(Long id) {
-        return bookRepository.findById(id)
+    public Book findByIsbn(String isbn) {
+        return bookRepository.findById(isbn)
           .orElseThrow(BookNotFoundException::new);
     }
 
@@ -33,17 +33,17 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public void deleteBook(Long id) {
-        bookRepository.findById(id)
+    public void deleteBook(String isbn) {
+        bookRepository.findById(isbn)
           .orElseThrow(BookNotFoundException::new);
-        bookRepository.deleteById(id);
+        bookRepository.deleteById(isbn);
     }
 
-    public Book updateBook(Book book, Long id) {
-        if (book.getId() != id) {
+    public Book updateBook(Book book, String isbn) {
+        if (book.getIsbn() != isbn) {
           throw new BookIdMismatchException();
         }
-        bookRepository.findById(id)
+        bookRepository.findById(isbn)
           .orElseThrow(BookNotFoundException::new);
         return bookRepository.save(book);
     }

@@ -26,18 +26,18 @@ public class BookController {
     private BookService bookService;
 
     @GetMapping
-    public Iterable findAll() {
+    public Iterable<Book> findAll() {
         return bookService.findAllBooks();
     }
 
     @GetMapping("/title/{bookTitle}")
-    public List findByTitle(@PathVariable String bookTitle) {
+    public List<Book> findByTitle(@PathVariable String bookTitle) {
         return bookService.findByTitle(bookTitle);
     }
 
     @GetMapping("/{id}")
-    public Book findOne(@PathVariable Long id) {
-        return bookService.findById(id);
+    public Book findOne(@PathVariable String isbn) {
+        return bookService.findByIsbn(isbn);
     }
 
     @PostMapping
@@ -49,13 +49,13 @@ public class BookController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         bookService.deleteBook(id);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Book updateBook(@RequestBody Book book, @PathVariable Long id) {
+    public Book updateBook(@RequestBody Book book, @PathVariable String id) {
         return bookService.updateBook(book, id);
     }
 }
