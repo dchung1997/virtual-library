@@ -1,5 +1,8 @@
 package com.example.virtuallibrary.config;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
@@ -38,7 +41,10 @@ public class DatabaseJobConfiguration {
     
     @Bean
     public Job job(JobRepository jobRepository, Step step) {
-        return new JobBuilder("DatabaseJobConfiguration6", jobRepository)
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
+        LocalDateTime now = LocalDateTime.now();
+
+        return new JobBuilder("BookDatabaseJobConfiguration: " + dtf.format(now), jobRepository)
         .start(step)
         .build();
     }    
