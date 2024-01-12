@@ -1,8 +1,5 @@
 package com.example.virtuallibrary.config;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
@@ -24,8 +21,7 @@ import org.springframework.batch.item.file.transform.FieldSet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.validation.BindException;
 
 import com.example.virtuallibrary.config.Listener.bookDataSkipListener;
@@ -35,21 +31,14 @@ import com.example.virtuallibrary.models.Book;
 public class DatabaseJobConfiguration {
     
     @Bean
-    public PlatformTransactionManager transactionManager(DataSource dataSource) {
-        return new JdbcTransactionManager(dataSource);
-    }
-    
-    @Bean
     public Job job(JobRepository jobRepository, Step step) {
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");  
-        LocalDateTime now = LocalDateTime.now();
 
-        return new JobBuilder("BookDatabaseJobConfiguration: " + dtf.format(now), jobRepository)
+        return new JobBuilder("BookDatabaseJobConfiguration", jobRepository)
         .start(step)
         .build();
     }    
     @Bean 
-    public Step step(JobRepository jobRepository, JdbcTransactionManager transactionManager, 
+    public Step step(JobRepository jobRepository, JpaTransactionManager transactionManager, 
                         ItemReader<Book> bookDataFileReader, ItemWriter<Book> bookDataTableWriter, bookDataSkipListener skipListener) {
         return new StepBuilder("fileIngesting", jobRepository)
                 .<Book,Book>chunk(100, transactionManager)
