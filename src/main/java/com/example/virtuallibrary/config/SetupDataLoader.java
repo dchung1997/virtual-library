@@ -41,7 +41,7 @@ public class SetupDataLoader implements
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
  
-        if (alreadySetup)
+        if (alreadySetup || userRepository.findByUsername("test") != null)
             return;
         Privilege readPrivilege
           = createPrivilegeIfNotFound("READ_PRIVILEGE");
