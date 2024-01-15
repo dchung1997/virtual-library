@@ -4,8 +4,8 @@
                 <nav class="navbar navbar-dark d-flex flex-wrap align-items-center justify-content-center justify-content-md-between">
                     <a class="navbar-brand col-md-3 mb-2 mb-md-0" href="/">Virtual Library</a>
                     <div class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-                        <form class="input-group" role="search" action="/title/{bookTitle}" method="get" id="search"> 
-                            <input class="form-control" type="search" placeholder="Search" aria-label="Search">
+                        <form class="input-group" role="search" action="/api/books/title" method="get" id="search"> 
+                            <input class="form-control" type="search" placeholder="Search" aria-label="Search" th:value="${bookTitle}">
                             <span class="input-group-append">
                                 <button class="btn btn-outline-secondary bg-white border-start-0 border-bottom-0 border ms-n5" type="submit" value="submit">
                                     <i class="fa fa-search"></i>
@@ -16,11 +16,62 @@
                     <div class="col-md-3 text-end">
                         <a class="btn btn-light" href="/login" sec:authorize="!isFullyAuthenticated()">Login</a>
                         <a class="btn btn-light" href="/logout" sec:authorize="isFullyAuthenticated()">Logout</a>
-                        <a href="/checkout" sec:authorize="!isFullyAuthenticated()">
-                            <i class="fa-solid fa-cart-shopping whiteiconcolor"></i>
+                        <a class="btn btn-light checkout-button" href="/checkout" sec:authorize="!isFullyAuthenticated()">
+                            <i class="fa-solid fa-cart-shopping"></i>
                         </a>
                     </div>
                 </nav> 
             </div> 
         </header>
+</div>
+
+<div th:fragment="book-carousel (name)">
+    <h2 th:text="${name}">Carousel Header</h2>
+    <div class="row py-3">
+      <div class="col">
+        <div class="card shadow-sm">
+          <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+          <div class="card-body">
+            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+              </div>
+              <small class="text-body-secondary">9 mins</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card shadow-sm">
+          <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+          <div class="card-body">
+            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+              </div>
+              <small class="text-body-secondary">9 mins</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card shadow-sm">
+          <svg class="bd-placeholder-img card-img-top" width="100%" height="225" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title><rect width="100%" height="100%" fill="#55595c"></rect><text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text></svg>
+          <div class="card-body">
+            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
+              </div>
+              <small class="text-body-secondary">9 mins</small>
+            </div>
+          </div>
+        </div>
+      </div>    
+    </row>
 </div>
