@@ -3,6 +3,8 @@ package com.example.virtuallibrary.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -17,34 +19,36 @@ public class BookService {
     @Autowired
     private BookRepository bookRepository;
 
-    public Iterable<Book> findAllBooks() {
-        return bookRepository.findAll();
-    } 
+    public Page<Book> findAllBooks(Pageable pageable) {
+      return bookRepository.findAll(pageable);
+    }    
 
     public List<Book> findByTitle(String bookTitle) {
         return bookRepository.findByTitle(bookTitle);
     }
 
     public Book findByIsbn(String isbn) {
-        return bookRepository.findById(isbn)
-          .orElseThrow(BookNotFoundException::new);
-    }
-
-    public List<Book> findFifteenBooksByCategory(String genre) {
-        return bookRepository.findByCategories(genre, PageRequest.of(0, 15));
+        return bookRepository.findById(isbn);
     }
 
     public List<Book> findFifteenBooksRandom() {
       return bookRepository.findRandomBooks(PageRequest.of(0, 15));
-  }    
+    }    
+
+    public List<Book> findFifteenBooksFiction() {
+      return bookRepository.findFictionBooks(PageRequest.of(0, 15));
+    }    
+
+    public List<Book> findFifteenBooksNonFiction() {
+      return bookRepository.findNonFictionBooks(PageRequest.of(0, 15));
+    }
 
     public Book createBook(Book book) {
         return bookRepository.save(book);
     }
 
     public void deleteBook(String isbn) {
-        bookRepository.findById(isbn)
-          .orElseThrow(BookNotFoundException::new);
+        bookRepository.findById(isbn);
         bookRepository.deleteById(isbn);
     }
 
@@ -52,9 +56,9 @@ public class BookService {
         if (book.getIsbn() != isbn) {
           throw new BookIdMismatchException();
         }
-        bookRepository.findById(isbn)
-          .orElseThrow(BookNotFoundException::new);
+        bookRepository.findById(isbn);
         return bookRepository.save(book);
     }
+
 
 }
