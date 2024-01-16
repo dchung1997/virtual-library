@@ -3,6 +3,7 @@ package com.example.virtuallibrary.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.example.virtuallibrary.exceptions.BookIdMismatchException;
@@ -28,6 +29,14 @@ public class BookService {
         return bookRepository.findById(isbn)
           .orElseThrow(BookNotFoundException::new);
     }
+
+    public List<Book> findFifteenBooksByCategory(String genre) {
+        return bookRepository.findByCategories(genre, PageRequest.of(0, 15));
+    }
+
+    public List<Book> findFifteenBooksRandom() {
+      return bookRepository.findRandomBooks(PageRequest.of(0, 15));
+  }    
 
     public Book createBook(Book book) {
         return bookRepository.save(book);
