@@ -3,3 +3,11 @@
     color: white;
     border: none;
 }
+
+.ms-n5 {
+    margin-left: -40px;
+}
+
+.input-group input.form-control  {
+    border-radius: 5px!important;
+}
