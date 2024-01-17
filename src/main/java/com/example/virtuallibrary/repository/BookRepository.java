@@ -20,6 +20,8 @@ public interface BookRepository extends PagingAndSortingRepository<Book, String>
     @Query("SELECT b FROM Book b ORDER BY RANDOM()")
     List<Book> findRandomBooks(PageRequest pageRequest);
     void deleteById(String isbn);
+    @Query("SELECT DISTINCT b FROM Book b WHERE LOWER(categories) LIKE LOWER(CONCAT('%', :context, '%')) OR isbn LIKE LOWER(CONCAT('%', :context, '%')) OR LOWER(author) LIKE LOWER(CONCAT('%', :context, '%')) OR LOWER(title) LIKE LOWER(CONCAT('%', :context, '%'))" )
+    Page<Book> findBy(String context, Pageable pageable);
     Page<Book> findAll(Pageable pageable);
     Book save(Book book);
     Book findById(String isbn);

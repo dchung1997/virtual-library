@@ -60,5 +60,9 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    public Page<Book> findBook(String context, Pageable pageable) {
+      return bookRepository.findBy(context, pageable);
+    }
+
 
 }

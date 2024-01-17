@@ -12,6 +12,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.service.BookService;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/books")
@@ -29,4 +31,13 @@ public class BookController {
 
         return books;
     }
+
+    @GetMapping("/search")
+    public ModelAndView search(@RequestParam String context, Pageable pageable) {
+        ModelAndView books = new ModelAndView("books");
+        Page<Book> queryBooks = bookService.findBook(context, pageable);
+        books.addObject("results", queryBooks);
+        return books;
+    }
+    
 }
