@@ -34,9 +34,13 @@ public class BookController {
 
     @GetMapping("/search")
     public ModelAndView search(@RequestParam String context, Pageable pageable) {
-        ModelAndView books = new ModelAndView("books");
+        ModelAndView books = new ModelAndView("bookSearch");
         Page<Book> queryBooks = bookService.findBook(context, pageable);
+
         books.addObject("results", queryBooks);
+        books.addObject("context", context);
+        books.addObject("page", pageable.getPageNumber());
+        books.addObject("totalPages", queryBooks.getTotalPages());        
         return books;
     }
     

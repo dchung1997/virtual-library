@@ -26,7 +26,6 @@ public class HomeController {
         List<Book> fictionalBooks = bookService.findFifteenBooksFiction();
         List<Book> nonFictionalBooks = bookService.findFifteenBooksNonFiction();
 
-
         home.addObject("random5", randomBooks.subList(0, 5));
         home.addObject("random10", randomBooks.subList(5, 10));
         home.addObject("random15", randomBooks.subList(10, 15));
