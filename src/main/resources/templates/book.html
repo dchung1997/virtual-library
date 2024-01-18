@@ -30,12 +30,12 @@
                     <h2 th:text="${book.title}"> Book Title </h2>
                     <h6 th:text="${book.author}" class="font-weight-bold"> Book Author </h6>
                     <p th:text="${book.categories}"> Genre </p>
-                    <p th:text="${book.description}"> Description </p>
+                    <p th:text="${#strings.isEmpty(book.description) ? 'No description available.': book.description }"> Description </p>
                 </div>
                 <div class="col-12 col-md-3">
                     <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title" th:text="${available > 0 ? 'Available' : 'All copies in use'}">Card title</h5>
+                        <div class="card-header">
+                            <h5 class="card-title" th:classappend="${available > 0 ? 'text-success' : 'text-danger'}" th:text="${available > 0 ? 'Available' : 'All copies in use'}">Card title</h5>
                             <span th:inline="text">[[${copies} + ' copies']]</span>
                             <span th:inline="text">[[${available} + ' available']]</span>
                         </div>
