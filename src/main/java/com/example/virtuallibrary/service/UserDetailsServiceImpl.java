@@ -1,7 +1,6 @@
 package com.example.virtuallibrary.service;
 
 import java.util.Arrays;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,6 +38,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
           .orElseThrow(UserNotFoundException::new);
     }
 
+    public User findByUserName(String name) {
+        return userRepository.findByUsername(name);
+    }
+
     public boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
@@ -66,14 +69,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         userRepository.findById(id)
           .orElseThrow(UserNotFoundException::new);
         return userRepository.save(user);
-    }
-
-
-    public boolean hasId(Long id) {
-      String username =  ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
-      User user = userRepository.findByUsername(username);
-    
-      return user.getId().equals(id);
     }
 
     @Override

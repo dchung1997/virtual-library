@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +15,11 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.models.RatingInfo;
+import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.service.BookService;
+import com.example.virtuallibrary.service.UserDetailsServiceImpl;
+
+
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -23,6 +29,10 @@ public class BookController {
 
     @Autowired
     private BookService bookService;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
 
     @GetMapping
     public ModelAndView findAll(Pageable pageable) {
@@ -66,6 +76,26 @@ public class BookController {
             bookView.addObject("copies", totalBooks);
             bookView.addObject("book", book);
         }
+        return bookView;
+    } 
+    
+    @GetMapping("/{isbn}/hold") 
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView holdBook(@PathVariable String isbn, Authentication authentication) {
+        // TODO add error checks.
+        ModelAndView bookView = new ModelAndView("redirect:/books/" + isbn);
+
+        User user = userDetailsService.findByUserName(authentication.getName());
+        List<Book> books = bookService.findByIsbn(isbn);
+        for (int i = 0; i < books.size(); i++) {
+            Book indexBook = books.get(i);
+            if (indexBook.isAvailable()) {
+                indexBook.setAvailable(false);
+                indexBook.setCurrentUser(user);
+                bookService.updateBook(indexBook, indexBook.getId());
+            }
+        }
+
         return bookView;
     }    
 }

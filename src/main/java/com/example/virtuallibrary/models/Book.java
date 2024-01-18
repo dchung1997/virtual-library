@@ -51,7 +51,7 @@ public class Book {
     @ManyToOne
     @JoinColumn(name = "user_id") // Specify the foreign key column
     private User currentUser; // Add the property to hold the user reference
-    
+
     public Book() {
         super();
     }
@@ -69,6 +69,7 @@ public class Book {
         this.num_pages = num_pages;
         this.ratings_count = ratings_count;
         this.available = true;
+        this.currentUser = null;
     }
 
     public Long getId() {
@@ -163,5 +164,12 @@ public class Book {
         this.available = available;
     }
     
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(User currentUser) {
+        this.currentUser = currentUser;
+    }    
 
 }

@@ -40,7 +40,7 @@
                             <span th:inline="text">[[${available} + ' available']]</span>
                         </div>
                         <div class="card-body">
-                            <a href="#" class="btn btn-primary">Place hold</a>
+                            <a th:href="'/books/' + ${book.isbn} + '/hold'" class="btn btn-primary">Place hold</a>
                             <a href="#" class="btn btn-secondary">Save for later</a>
                         </div>
                       </div>
