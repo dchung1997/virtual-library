@@ -29,7 +29,8 @@ public class BookController {
         Page<Book> foundBooks = bookService.findAllBooks(pageable);
 
         books.addObject("results", foundBooks);
-
+        books.addObject("page", pageable.getPageNumber());
+        books.addObject("totalPages", foundBooks.getTotalPages());    
         return books;
     }
 

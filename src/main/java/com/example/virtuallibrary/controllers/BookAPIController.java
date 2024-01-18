@@ -37,7 +37,7 @@ public class BookAPIController {
         return bookService.findByTitle(bookTitle);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{isbn}")
     public Book findOne(@PathVariable String isbn) {
         System.out.println(isbn);
         return bookService.findByIsbn(isbn);

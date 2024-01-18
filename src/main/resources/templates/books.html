@@ -35,13 +35,13 @@
         <nav aria-label="Book Navigation">
             <ul class="pagination justify-content-center">
               <li th:classappend="${page > 1} ? 'page-item' : 'page-item disabled'">
-                <a class="page-link" th:href="@{/books/search(context=${context})(page=${page - 1})}">Previous</a>
+                <a class="page-link" th:href="@{/books(page=${page - 1})}">Previous</a>
               </li>
-              <li th:classappend="${page > 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/search(context=${context})(page=${page - 1})}" th:text="${page - 1}">1</a></li>
-              <li class="page-item"><a class="page-link" th:href="@{/books/search(context=${context})(page=${page})}" th:text="${page}">2</a></li>
-              <li th:classappend="${page < totalPages - 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/search(context=${context})(page=${page + 1})}" th:text="${page + 1}">3</a></li>
+              <li th:classappend="${page > 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books(page=${page - 1})}" th:text="${page - 1}">1</a></li>
+              <li class="page-item"><a class="page-link" th:href="@{/books(page=${page})}" th:text="${page}">2</a></li>
+              <li th:classappend="${page < totalPages - 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books(page=${page + 1})}" th:text="${page + 1}">3</a></li>
               <li th:classappend="${page < totalPages -1} ? 'page-item' : 'page-item disabled'">
-                <a class="page-link" th:href="@{/books/search(context=${context})(page=${page + 1})}">Next</a>
+                <a class="page-link" th:href="@{/books(page=${page + 1})}">Next</a>
               </li>
             </ul>
           </nav>
