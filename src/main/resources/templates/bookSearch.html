@@ -17,7 +17,7 @@
     <main>
         <div class="container">
             <div class="list-group" th:each="element: ${results}">
-                <a href="#" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                <a th:attr="href='/books/' + ${element.isbn}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
                     <img th:src="${element.thumbnail}" width="32" height="32" class="rounded-circle flex-shrink-0">
                     <div class="d-flex gap-2 w-100 justify-content-between">
                       <div>

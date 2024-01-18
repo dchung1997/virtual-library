@@ -16,7 +16,7 @@
                     <div class="col-md-3 text-end">
                         <a class="btn btn-light" href="/login" sec:authorize="!isFullyAuthenticated()">Login</a>
                         <a class="btn btn-light" href="/logout" sec:authorize="isFullyAuthenticated()">Logout</a>
-                        <a class="btn btn-light checkout-button" href="/checkout" sec:authorize="!isFullyAuthenticated()">
+                        <a class="btn btn-light checkout-button" href="/checkout" sec:authorize="isFullyAuthenticated()">
                             <i class="fa-solid fa-cart-shopping"></i>
                         </a>
                     </div>
