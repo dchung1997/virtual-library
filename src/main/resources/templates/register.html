@@ -15,19 +15,21 @@
 </head>
 <body>
   <div th:replace="~{fragments :: navbar}"></div>
-  <main class="form w-100 m-auto shadow">
-    <form action="/register" th:object="${user}" method="POST" enctype="utf8">
-      <h1 class="mb-4 text-center">Register</h1>
-      <div class="form-floating">
-        <input class="form-control" th:field="*{username}" placeholder="BobbyTables">
-        <label for="username">Username</label>
+  <main class="py-4">
+      <div class="container form w-100 m-auto shadow ">
+        <form action="/register" th:object="${user}" method="POST" enctype="utf8">
+          <h1 class="mb-4 text-center">Register</h1>
+          <div class="form-floating">
+            <input class="form-control" th:field="*{username}" placeholder="BobbyTables">
+            <label for="username">Username</label>
+          </div>
+          <div class="form-floating">
+            <input type="password" class="form-control" th:field="*{password}" placeholder="Password">
+            <label for="password">Password</label>
+          </div>
+          <span class="referrer-link">Already have an account? Click here to <a href="/login">Sign in</a></span>        
+          <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
+        </form>
       </div>
-      <div class="form-floating">
-        <input type="password" class="form-control" th:field="*{password}" placeholder="Password">
-        <label for="password">Password</label>
-      </div>
-      <span class="referrer-link">Already have an account? Click here to <a href="/login">Sign in</a></span>        
-      <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
-    </form>
     </main>
 </body>
