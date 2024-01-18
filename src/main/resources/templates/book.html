@@ -32,8 +32,18 @@
                     <p th:text="${book.categories}"> Genre </p>
                     <p th:text="${book.description}"> Description </p>
                 </div>
-                <div class="col-12 col-md">
-                    <!-- TODO: Add Checkout here eventually.  -->
+                <div class="col-12 col-md-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title" th:text="${available > 0 ? 'Available' : 'All copies in use'}">Card title</h5>
+                            <span th:inline="text">[[${copies} + ' copies']]</span>
+                            <span th:inline="text">[[${available} + ' available']]</span>
+                        </div>
+                        <div class="card-body">
+                            <a href="#" class="btn btn-primary">Place hold</a>
+                            <a href="#" class="btn btn-secondary">Save for later</a>
+                        </div>
+                      </div>
                 </div>
             </div>
             <hr/>

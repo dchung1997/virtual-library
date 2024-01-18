@@ -1,6 +1,7 @@
 package com.example.virtuallibrary.models;
 
 import java.util.Collection;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -23,6 +25,9 @@ public class User {
 
     @Column(nullable = false)    
     private String password;
+
+    @OneToMany(mappedBy = "currentUser") // Use @OneToMany in User
+    private List<Book> checkouts; // Reference the join entity
 
     @ManyToMany(fetch = FetchType.EAGER)   
     private Collection<Role> roles;

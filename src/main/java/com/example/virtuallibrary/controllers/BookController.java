@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.virtuallibrary.models.Book;
+import com.example.virtuallibrary.models.RatingInfo;
 import com.example.virtuallibrary.service.BookService;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -49,17 +50,22 @@ public class BookController {
 
     @GetMapping("/{isbn}")    
     public ModelAndView getBook(@PathVariable String isbn) {
+        // TODO add error checks.
         ModelAndView bookView = new ModelAndView("book");
-        Book book = bookService.findByIsbn(isbn);
-        
-        double rating = book.getAverage_rating();
-        int wholeStars = (int) rating; 
-        double fractionalPart = rating - wholeStars;  
-        
-        bookView.addObject("rating", wholeStars);
-        bookView.addObject("fractionalPart", fractionalPart);
-        bookView.addObject("book", book);
+        List<Book> books = bookService.findByIsbn(isbn);
+        if (books.size() > 0) {
+            Book book = books.get(0);
+            int totalBooks = books.size();
+            int available = bookService.countAvailableBooks(books);
+            RatingInfo ratingInfo = bookService.calculateRatingInfo(book);
 
+            
+            bookView.addObject("rating", ratingInfo.getWholeStars());
+            bookView.addObject("fractionalPart", ratingInfo.getFractionalPart());
+            bookView.addObject("available", available);
+            bookView.addObject("copies", totalBooks);
+            bookView.addObject("book", book);
+        }
         return bookView;
     }    
 }

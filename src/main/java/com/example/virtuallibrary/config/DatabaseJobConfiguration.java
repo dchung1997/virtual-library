@@ -1,5 +1,8 @@
 package com.example.virtuallibrary.config;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import javax.sql.DataSource;
 
 import org.springframework.batch.core.Job;
@@ -32,8 +35,8 @@ public class DatabaseJobConfiguration {
     
     @Bean
     public Job job(JobRepository jobRepository, Step step) {
-
-        return new JobBuilder("BookDatabaseJobConfiguration", jobRepository)
+        String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        return new JobBuilder("BookDatabaseJobConfiguration: " + dateTime, jobRepository)
         .start(step)
         .build();
     }    
@@ -73,6 +76,7 @@ public class DatabaseJobConfiguration {
                             book.setPublished_year(fieldSet.readInt("published_year", -1));
                             book.setNum_pages(fieldSet.readInt("num_pages", -1));
                             book.setRatings_count(fieldSet.readInt("ratings_count", -1));
+                            book.setAvailable(true);
                             try {
                                 book.setAverage_rating(fieldSet.readDouble("average_rating"));
                             } catch (NullPointerException ex) {
@@ -91,8 +95,8 @@ public class DatabaseJobConfiguration {
 
     @Bean
     public JdbcBatchItemWriter<Book> billingDataTableWriter(DataSource dataSource) {
-        String sql = "insert into BOOK(isbn, title, author, categories, thumbnail, description, published_year, average_rating, num_pages, ratings_count) " +  
-                        "values(:isbn, :title, :author, :categories, :thumbnail, :description, :published_year, :average_rating, :num_pages, :ratings_count)";
+        String sql = "insert into BOOK(isbn, title, author, categories, thumbnail, description, published_year, average_rating, num_pages, ratings_count, available) " +  
+                        "values(:isbn, :title, :author, :categories, :thumbnail, :description, :published_year, :average_rating, :num_pages, :ratings_count, :available)";
 
         return new JdbcBatchItemWriterBuilder<Book>()
                 .dataSource(dataSource)

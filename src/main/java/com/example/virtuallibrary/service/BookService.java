@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.example.virtuallibrary.exceptions.BookIdMismatchException;
 import com.example.virtuallibrary.exceptions.BookNotFoundException;
 import com.example.virtuallibrary.models.Book;
+import com.example.virtuallibrary.models.RatingInfo;
 import com.example.virtuallibrary.repository.BookRepository;
 
 @Service
@@ -27,8 +28,8 @@ public class BookService {
         return bookRepository.findByTitle(bookTitle);
     }
 
-    public Book findByIsbn(String isbn) {
-        return bookRepository.findById(isbn);
+    public List<Book> findByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn);
     }
 
     public List<Book> findFifteenBooksRandom() {
@@ -47,22 +48,39 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public void deleteBook(String isbn) {
-        bookRepository.findById(isbn);
-        bookRepository.deleteById(isbn);
+    public void deleteBook(Long id) {
+        bookRepository.findById(id);
+        bookRepository.deleteById(id);
     }
 
-    public Book updateBook(Book book, String isbn) {
-        if (book.getIsbn() != isbn) {
+    public Book updateBook(Book book, Long id) {
+        if (book.getId() != id) {
           throw new BookIdMismatchException();
         }
-        bookRepository.findById(isbn);
+        bookRepository.findById(id);
         return bookRepository.save(book);
     }
 
     public Page<Book> findBook(String context, Pageable pageable) {
       return bookRepository.findBy(context, pageable);
     }
+
+    public int countAvailableBooks(List<Book> books) {
+      int available = 0;
+      for (int i = 0; i < books.size(); i++) {
+          if (books.get(i).isAvailable()) {
+              available += 1;
+          }
+      }      
+      return available;
+    }
+
+  public RatingInfo calculateRatingInfo(Book book) {
+      double rating = book.getAverage_rating();
+      int wholeStars = (int) rating;
+      double fractionalPart = rating - wholeStars;
+      return new RatingInfo(wholeStars, fractionalPart);
+  }    
 
 
 }

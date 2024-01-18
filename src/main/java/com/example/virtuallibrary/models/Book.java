@@ -2,13 +2,20 @@ package com.example.virtuallibrary.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Book {
  
     @Id
-    @Column(nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, length=13)
     private String isbn;
 
     @Column(nullable = false, length=1000)
@@ -37,9 +44,14 @@ public class Book {
 
     @Column(nullable = true)
     private int ratings_count;
-    
-    
 
+    @Column(nullable = false)
+    private boolean available;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id") // Specify the foreign key column
+    private User currentUser; // Add the property to hold the user reference
+    
     public Book() {
         super();
     }
@@ -56,6 +68,11 @@ public class Book {
         this.average_rating = average_rating;
         this.num_pages = num_pages;
         this.ratings_count = ratings_count;
+        this.available = true;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -136,6 +153,14 @@ public class Book {
 
     public void setRatings_count(int ratings_count) {
         this.ratings_count = ratings_count;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
     
 

@@ -38,7 +38,7 @@ public class BookAPIController {
     }
 
     @GetMapping("/{isbn}")
-    public Book findOne(@PathVariable String isbn) {
+    public List<Book> findOne(@PathVariable String isbn) {
         System.out.println(isbn);
         return bookService.findByIsbn(isbn);
     }
@@ -52,13 +52,13 @@ public class BookAPIController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void delete(@PathVariable String id) {
+    public void delete(@PathVariable Long id) {
         bookService.deleteBook(id);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Book updateBook(@RequestBody Book book, @PathVariable String id) {
+    public Book updateBook(@RequestBody Book book, @PathVariable Long id) {
         return bookService.updateBook(book, id);
     }
 }
