@@ -5,3 +5,7 @@
 .ratings {
     text-align: center;
 }
+
+.sidebar .subjects {
+    max-height: 400px;
+}
