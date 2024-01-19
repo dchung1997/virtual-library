@@ -52,7 +52,7 @@ public class BookController {
         Page<Book> queryBooks = bookService.findBook(context, pageable);
         List<CategoriesCount> categoryCount = bookService.getCategoryCount();
         categoryCount.removeIf(cc -> cc.getCount() < 5);
-        categoryCount.removeIf((cc -> cc.getCategories() == ""));
+        categoryCount.removeIf((cc -> cc.getCategories().isBlank()));
 
         books.addObject("categories", categoryCount);
         books.addObject("results", queryBooks);
