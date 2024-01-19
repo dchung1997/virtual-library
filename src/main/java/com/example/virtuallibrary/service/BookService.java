@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.example.virtuallibrary.exceptions.BookIdMismatchException;
 import com.example.virtuallibrary.exceptions.BookNotFoundException;
 import com.example.virtuallibrary.models.Book;
+import com.example.virtuallibrary.models.CategoriesCount;
 import com.example.virtuallibrary.models.RatingInfo;
 import com.example.virtuallibrary.repository.BookRepository;
 
@@ -63,6 +64,10 @@ public class BookService {
 
     public Page<Book> findBook(String context, Pageable pageable) {
       return bookRepository.findBy(context, pageable);
+    }
+
+    public List<CategoriesCount> getCategoryCount() {
+      return bookRepository.getCategoryCount();
     }
 
     public int countAvailableBooks(List<Book> books) {

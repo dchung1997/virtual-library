@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.virtuallibrary.models.Book;
+import com.example.virtuallibrary.models.CategoriesCount;
 import com.example.virtuallibrary.models.RatingInfo;
 import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.service.BookService;
@@ -49,7 +50,10 @@ public class BookController {
     public ModelAndView search(@RequestParam String context, Pageable pageable) {
         ModelAndView books = new ModelAndView("bookSearch");
         Page<Book> queryBooks = bookService.findBook(context, pageable);
+        List<CategoriesCount> categoryCount = bookService.getCategoryCount();
+        categoryCount.removeIf(cc -> cc.getCount() < 5);
 
+        books.addObject("categories", categoryCount);
         books.addObject("results", queryBooks);
         books.addObject("context", context);
         books.addObject("page", pageable.getPageNumber());
