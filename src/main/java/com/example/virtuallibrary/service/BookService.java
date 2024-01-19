@@ -66,8 +66,8 @@ public class BookService {
       return bookRepository.findBy(context, pageable);
     }
 
-    public List<CategoriesCount> getCategoryCount() {
-      return bookRepository.getCategoryCount();
+    public List<CategoriesCount> getCategoryCount(String context) {
+      return bookRepository.getCategoryCount(context);
     }
 
     public int countAvailableBooks(List<Book> books) {

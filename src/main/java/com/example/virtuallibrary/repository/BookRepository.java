@@ -23,8 +23,8 @@ public interface BookRepository extends PagingAndSortingRepository<Book, Long> {
     void deleteById(Long id);
     @Query("SELECT DISTINCT b FROM Book b WHERE LOWER(categories) LIKE LOWER(CONCAT('%', :context, '%')) OR isbn LIKE LOWER(CONCAT('%', :context, '%')) OR LOWER(author) LIKE LOWER(CONCAT('%', :context, '%')) OR LOWER(title) LIKE LOWER(CONCAT('%', :context, '%'))" )
     Page<Book> findBy(String context, Pageable pageable);
-    @Query("SELECT new com.example.virtuallibrary.models.CategoriesCount(b.categories, COUNT(b)) FROM Book b GROUP BY b.categories ORDER BY count(b) DESC")
-    List<CategoriesCount> getCategoryCount();
+    @Query("SELECT new com.example.virtuallibrary.models.CategoriesCount(b.categories, COUNT(b)) FROM Book b WHERE LOWER(categories) LIKE LOWER(CONCAT('%', :context, '%')) OR isbn LIKE LOWER(CONCAT('%', :context, '%')) OR LOWER(author) LIKE LOWER(CONCAT('%', :context, '%')) OR LOWER(title) LIKE LOWER(CONCAT('%', :context, '%')) GROUP BY b.categories ORDER BY count(b) DESC")
+    List<CategoriesCount> getCategoryCount(String context);
     Page<Book> findAll(Pageable pageable);
     Book save(Book book);
     Book findById(Long id);

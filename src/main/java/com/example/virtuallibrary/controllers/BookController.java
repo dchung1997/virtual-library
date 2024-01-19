@@ -50,7 +50,7 @@ public class BookController {
     public ModelAndView search(@RequestParam String context, Pageable pageable) {
         ModelAndView books = new ModelAndView("bookSearch");
         Page<Book> queryBooks = bookService.findBook(context, pageable);
-        List<CategoriesCount> categoryCount = bookService.getCategoryCount();
+        List<CategoriesCount> categoryCount = bookService.getCategoryCount(context);
         categoryCount.removeIf(cc -> cc.getCount() < 5);
         categoryCount.removeIf((cc -> cc.getCategories().isBlank()));
 
