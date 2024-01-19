@@ -17,16 +17,16 @@
     <div th:replace="~{fragments :: navbar}"></div>
     <main>
         <div class="container py-4">
-            <h2 th:inline="text">[['Results: ' + ${results.getSize()}]]</h2>
-              <div class="row">
+            <h2>Browse <span th:inline="text"> [['(' + ${totalElements} + ')']]</span> </h2>
+              <div class="row py-4">
                 <div class="col-md-4 d-none d-md-block sidebar">
                   <h4>Subjects</h4>
-                  <div class="subjects overflow-scroll">
+                  <div class="subjects bg-body-tertiary overflow-scroll">
                     <div class="list-group" th:each="subject: ${categories}">
                       <label class="list-group-item d-flex gap-2">
-                        <input class="form-check-input flex-shrink-0" type="checkbox" value="" checked="">
+                        <input class="form-check-input flex-shrink-0" type="checkbox" value="">
                         <span class="text-start" th:text="${subject.categories}">Subject</span>
-                        <span class="text-end" th:text="${subject.count}">Count</span>
+                        <span class="text-end ms-auto" th:text="${subject.count}">Count</span>
                       </label>
                     </div>
                   </div>

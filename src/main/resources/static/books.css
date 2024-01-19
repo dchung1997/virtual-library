@@ -8,4 +8,10 @@
 
 .sidebar .subjects {
     max-height: 400px;
+    overflow-x: hidden!important;
+}
+
+.sidebar .list-group {
+    padding-bottom: 0;
+    border-radius: 0;
 }
