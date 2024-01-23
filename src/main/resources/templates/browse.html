@@ -38,7 +38,7 @@
                          [[ ${filter} ]]
                         <button onclick="handleCategoriesChange(this)" th:value="${filter}"><i class="fa-solid fa-x"></i></button>
                     </span>
-                    <a th:if="${#lists.size(delimitedCategories) gt 0}" onclick="handleReset()">Clear All</a>
+                    <button class="reset-button" th:if="${#lists.size(delimitedCategories) gt 0}" onclick="handleReset()">Clear All</button>
                   </div>
                   <div class="row">
                     <div class="list-group col-lg-6 col-12" th:each="element: ${results}">
@@ -139,7 +139,7 @@
         const baseUrl = currentUrl.origin;
         const pathUrl = currentUrl.pathname;        
         let newUrl;
-        
+
         if (Object.keys(keyValuePairs).length > 0 ) {
           const newParams = new URLSearchParams();
           newParams.append('context', keyValuePairs['context']);        

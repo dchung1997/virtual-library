@@ -24,20 +24,37 @@
     display: none;
 }
 
+.filter button {
+    all: initial;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    background-color: transparent;
+    color: inherit;
+    text-decoration: none;
+}
+
+.filter .reset-button {
+    color: #007bff!important;
+    cursor: pointer;
+}
+
+.filter .reset-button:hover {
+    text-decoration: underline;
+}
+
+.filter .reset-button:active {
+    text-decoration: underline;
+}
+
 span.badge {
     margin-right: 0.25em;
     font-size:12px;
 }
 
 span.badge button {
-    all: initial;
-    border: none;
-    padding: 0;
-    margin: 0;
     margin-left: 0.5em;
-    font-family: inherit;
-    font-size: inherit;
-    background-color: transparent;
-    color: inherit;
-    text-decoration: none;
+    cursor: pointer;
 }
