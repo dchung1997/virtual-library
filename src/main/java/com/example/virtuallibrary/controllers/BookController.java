@@ -51,8 +51,7 @@ public class BookController {
         ModelAndView books = new ModelAndView("browse");
         Page<Book> queryBooks = bookService.findByCriteria(context, criteria, pageable);
         List<CategoriesCount> categoryCount = bookService.getCategoryCount(context);
-        String[] delimitedCategories = criteria != null ? criteria.split(",") : new String[]{"default_category"} ;
-        System.out.println(criteria);
+        String[] delimitedCategories = criteria != null ? criteria.split(",") : new String[]{} ;
 
         books.addObject("categories", categoryCount);
         books.addObject("results", queryBooks);
