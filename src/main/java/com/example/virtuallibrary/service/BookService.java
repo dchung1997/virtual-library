@@ -1,10 +1,12 @@
 package com.example.virtuallibrary.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +17,21 @@ import com.example.virtuallibrary.models.CategoriesCount;
 import com.example.virtuallibrary.models.RatingInfo;
 import com.example.virtuallibrary.repository.BookRepository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+
 @Service
 public class BookService {
     
     @Autowired
     private BookRepository bookRepository;
+
+    @Autowired
+    private EntityManager em;
 
     public Page<Book> findAllBooks(Pageable pageable) {
       return bookRepository.findAll(pageable);
@@ -62,13 +74,101 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public Page<Book> findBook(String context, Pageable pageable) {
-      return bookRepository.findBy(context, pageable);
+    public Page<Book> findByCriteria(String context, String criteria, Pageable pageable) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<Book> query = cb.createQuery(Book.class);
+        Root<Book> root = query.from(Book.class);
+        Predicate rootPredicates = createPredicates(cb, root, context, criteria);
+
+        if (rootPredicates != null) {
+          query.where(rootPredicates);
+        }
+
+        query.distinct(true);
+
+        TypedQuery<Book> typedQuery = em.createQuery(query);
+        typedQuery.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+        typedQuery.setMaxResults(pageable.getPageSize());
+        List<Book> books = typedQuery.getResultList();
+
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Book> countRoot = countQuery.from(Book.class);
+        Predicate countRootPredicates = createPredicates(cb, countRoot, context, criteria);
+
+        if (countRootPredicates != null) {
+          countQuery.where(countRootPredicates);
+        }
+
+        countQuery.select(cb.count(countRoot));
+        countQuery.distinct(true);        
+        long totalElements = em.createQuery(countQuery).getSingleResult();
+
+        return new PageImpl<>(books, pageable, totalElements);
     }
 
     public List<CategoriesCount> getCategoryCount(String context) {
-      return bookRepository.getCategoryCount(context);
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery<CategoriesCount> query = cb.createQuery(CategoriesCount.class);
+
+        Root<Book> root = query.from(Book.class);
+        Predicate rootPredicates = createPredicates(cb, root, context, null);
+
+        if (rootPredicates != null) {
+          query.where(rootPredicates);
+        }
+
+        query.select(cb.construct(CategoriesCount.class, root.get("categories"), cb.count(root)));
+        query.groupBy(root.get("categories"));
+        query.orderBy(cb.desc(cb.count(root)));
+
+        // Execute query and get results
+        TypedQuery<CategoriesCount> typedQuery = em.createQuery(query);
+        List<CategoriesCount> categoriesCount = typedQuery.getResultList();
+        
+        categoriesCount.removeIf(cc -> cc.getCount() < 5);
+        categoriesCount.removeIf((cc -> cc.getCategories().isBlank()));
+
+        return categoriesCount;
     }
+
+    private Predicate createPredicates(CriteriaBuilder cb, Root<?> root, String context, String criteria) {
+      List<Predicate> predicatesContext = new ArrayList<>();
+      List<Predicate> predicatesCriteria = new ArrayList<>();
+  
+      if (context != null) {
+        String[] propertyNames = {"categories", "isbn", "author", "title"};
+        
+        for (String propertyName : propertyNames) {
+          predicatesContext.add(cb.like(cb.lower(root.get(propertyName)), "%" + context.toLowerCase() + "%"));
+        }
+      }
+
+      if (criteria != null) {
+        String[] delimitedCategories = criteria.split(",");
+        
+        for (String category : delimitedCategories) {
+          Predicate categoryPredicate = cb.equal(root.get("categories"), category);
+          predicatesCriteria.add(categoryPredicate);          
+        }
+      }
+      
+
+      Predicate combinedPredicateContext = cb.or(predicatesContext.toArray(new Predicate[0]));
+      Predicate combinedPredicateCriteria = cb.or(predicatesCriteria.toArray(new Predicate[0]));
+      
+      int contextSize = predicatesContext.size();
+      int criteriaSize = predicatesCriteria.size();
+
+      if (contextSize > 0 && criteriaSize > 0) {
+        return cb.and(combinedPredicateContext, combinedPredicateCriteria);
+      } else if (contextSize > 0) {
+        return combinedPredicateContext;
+      } else if (criteriaSize > 0) {
+        return combinedPredicateCriteria;
+      } else {
+        return null;
+      }
+    }    
 
     public int countAvailableBooks(List<Book> books) {
       int available = 0;

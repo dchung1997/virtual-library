@@ -24,7 +24,8 @@
                   <div class="subjects bg-body-tertiary overflow-scroll">
                     <div class="list-group" th:each="subject: ${categories}">
                       <label class="list-group-item d-flex gap-2">
-                        <input class="form-check-input flex-shrink-0" type="checkbox" value="">
+                        <input class="form-check-input flex-shrink-0" type="checkbox" th:checked="${#arrays.contains(delimitedCategories, subject.categories)}" 
+                                th:value="${subject.categories}" onclick="handleCategoriesChange(this)">
                         <span class="text-start" th:text="${subject.categories}">Subject</span>
                         <span class="text-end ms-auto" th:text="${subject.count}">Count</span>
                       </label>
@@ -32,6 +33,16 @@
                   </div>
                 </div>
                 <div class="col-12 col-md-8">
+                  <div class="badge">
+                    <span class="badge rounded-pill bg-primary">Primary</span>
+                    <span class="badge rounded-pill bg-secondary">Secondary</span>
+                    <span class="badge rounded-pill bg-success">Success</span>
+                    <span class="badge rounded-pill bg-danger">Danger</span>
+                    <span class="badge rounded-pill bg-warning text-dark">Warning</span>
+                    <span class="badge rounded-pill bg-info text-dark">Info</span>
+                    <span class="badge rounded-pill bg-light text-dark">Light</span>
+                    <span class="badge rounded-pill bg-dark">Dark</span>
+                  </div>
                   <div class="row">
                     <div class="list-group col-lg-6 col-12" th:each="element: ${results}">
                       <a th:attr="href='/books/' + ${element.isbn}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
@@ -64,16 +75,59 @@
         <nav aria-label="Book Navigation">
             <ul class="pagination justify-content-center">
               <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'">
-                <a class="page-link" th:href="@{/books/search(page=${page - 1}, context=${context})}">Previous</a>
+                <a class="page-link" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria})}">Previous</a>
               </li>
-              <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/search(page=${page - 1}, context=${context})}" th:text="${page - 1}">1</a></li>
-              <li class="page-item"><a class="page-link" th:href="@{/books/search(page=${page}, context=${context})}" th:text="${page}">2</a></li>
-              <li th:classappend="${page < totalPages - 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/search(page=${page + 1}, context=${context})}"  th:text="${page + 1}">3</a></li>
+              <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria})}" th:text="${page - 1}">1</a></li>
+              <li class="page-item"><a class="page-link" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria})}" th:text="${page}">2</a></li>
+              <li th:classappend="${page < totalPages - 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria})}"  th:text="${page + 1}">3</a></li>
               <li th:classappend="${page < totalPages -1} ? 'page-item' : 'page-item disabled'">
-                <a class="page-link" th:href="@{/books/search(page=${page + 1}, context=${context})}">Next</a>
+                <a class="page-link" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria})}">Next</a>
               </li>
             </ul>
           </nav>
     </footer>
+    <script>
+      function handleCategoriesChange(e) {
+        const currentUrl = new URL(window.location.href);
+        const search = currentUrl.search.slice(1);
+        const categories = search.split("&");
+
+        let keyValuePairs = categories.reduce((obj, item) => {
+          let [key, values] = item.split('=');
+          key = decodeURIComponent(key);
+          values = decodeURIComponent(values);
+          console.log(key);
+          console.log(values);
+
+          if (key === "criteria") {
+            obj[key] = values.split("%2C");
+          } else {
+            obj[key] = values;
+          }
+          return obj;
+        }, {});
+
+        const checkbox = e;
+        const value = checkbox.value;
+
+        if (keyValuePairs['criteria'] === undefined) {
+          keyValuePairs['criteria'] = value;
+        } else if (keyValuePairs['criteria'].includes(value)) {
+          const index = keyValuePairs['criteria'].indexOf(value);
+          keyValuePairs['criteria'].splice(index, 1);
+        } else {
+          keyValuePairs['criteria'].push(value);
+        }
+
+        const baseUrl = currentUrl.origin;
+        const pathUrl = currentUrl.pathname;
+        const newParams = new URLSearchParams();
+        for (const [index, property] of Object.entries(keyValuePairs)) {
+          newParams.append(index, property);
+        }        
+        const newUrl = new URL(pathUrl + "?" + newParams.toString(), baseUrl);
+        window.location.href = newUrl;
+      }
+    </script>    
   </body>
 </html>
