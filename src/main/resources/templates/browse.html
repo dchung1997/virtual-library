@@ -40,6 +40,30 @@
                     </span>
                     <button class="reset-button" th:if="${#lists.size(delimitedCategories) gt 0}" onclick="handleReset()">Clear All</button>
                   </div>
+                  <div class="sorting container">
+                      <span>Sort By:</span>
+                      <div class="btn-group">
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          Small button
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#">Action</a>
+                          <a class="dropdown-item" href="#">Another action</a>
+                          <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                      </div>
+                      <span class="align-right">
+                        <a class="icon-link btn" th:classappend="${page  < totalPages - 1} ? 'arrow' : 'arrow disabled'" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria})}">
+                          <i class="fa-solid fa-angle-right"></i>                        
+                        </a>
+                      </span>                      
+                      <span class="align-right">
+                        <a class="icon-link btn" th:classappend="${page > 0} ? 'arrow' : 'arrow disabled'" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria})}">
+                          <i class="fa-solid fa-angle-left"></i>                        
+                        </a>
+                      </span>
+                      <span class="align-right index" th:inline="text">[[${page * 20 + 1} + ' to ' + ${page * 20 + pageItems} + ' of ' + ${totalElements} + ' Results']]</span>
+                  </div>
                   <div class="row">
                     <div class="list-group col-lg-6 col-12" th:each="element: ${results}">
                       <a th:attr="href='/books/' + ${element.isbn}" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">

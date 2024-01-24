@@ -59,6 +59,7 @@ public class BookController {
         books.addObject("criteria", criteria);
         books.addObject("delimitedCategories", delimitedCategories);
         books.addObject("page", pageable.getPageNumber());
+        books.addObject("pageItems", queryBooks.getNumberOfElements());
         books.addObject("totalElements", queryBooks.getTotalElements());
         books.addObject("totalPages", queryBooks.getTotalPages());        
         return books;

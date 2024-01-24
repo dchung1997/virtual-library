@@ -58,3 +58,16 @@ span.badge button {
     margin-left: 0.5em;
     cursor: pointer;
 }
+
+.sorting {
+    margin-bottom: 0.5em;
+}
+
+.sorting .align-right {
+    float: right;
+}
+
+.sorting .index {
+    margin-right: 0.5em;
+}
+
