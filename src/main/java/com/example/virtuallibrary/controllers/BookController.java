@@ -47,14 +47,16 @@ public class BookController {
     }
 
     @GetMapping("/browse")
-    public ModelAndView browseAndSearch(@RequestParam(required = false) String context, @RequestParam(required = false) String criteria, Pageable pageable) {
+    public ModelAndView browseAndSearch(@RequestParam(required = false) String context, @RequestParam(required = false) String criteria, @RequestParam(required = false) String sort, Pageable pageable) {
         ModelAndView books = new ModelAndView("browse");
-        Page<Book> queryBooks = bookService.findByCriteria(context, criteria, pageable);
+        Page<Book> queryBooks = bookService.findByCriteria(context, criteria, sort, pageable);
         List<CategoriesCount> categoryCount = bookService.getCategoryCount(context);
         String[] delimitedCategories = criteria != null ? criteria.split(",") : new String[]{} ;
+        String sorter = sort != null ? sort : "Relevance";
 
         books.addObject("categories", categoryCount);
         books.addObject("results", queryBooks);
+        books.addObject("sort", sorter);
         books.addObject("context", context);
         books.addObject("criteria", criteria);
         books.addObject("delimitedCategories", delimitedCategories);

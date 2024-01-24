@@ -44,22 +44,25 @@
                   <div class="sorting container">
                       <span>Sort By:</span>
                       <div class="btn-group">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          Small button
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" th:text="${#strings.replace(#strings.capitalizeWords(sort), '_', ' ')}"
+                        >
+                          Relevance
                         </button>
-                        <div class="dropdown-menu">
-                          <a class="dropdown-item" href="#">Action</a>
-                          <a class="dropdown-item" href="#">Another action</a>
-                          <a class="dropdown-item" href="#">Something else here</a>
-                        </div>
-                      </div>
+                        <ul class="dropdown-menu">
+                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='relevance')}">Relevance</a>
+                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='title')}">Title</a>
+                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='author')}">Author</a>
+                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='published_year')}">Publication Year</a>
+                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='average_rating')}">Average Rating</a>
+                        </ul>
+                      </div>                      
                       <span class="align-right">
-                        <a class="icon-link btn" th:classappend="${page  < totalPages - 1} ? 'arrow' : 'arrow disabled'" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria})}">
+                        <a class="icon-link btn" th:classappend="${page  < totalPages - 1} ? 'arrow' : 'arrow disabled'" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria}, sort=${sort})}">
                           <i class="fa-solid fa-angle-right"></i>                        
                         </a>
                       </span>                      
                       <span class="align-right">
-                        <a class="icon-link btn" th:classappend="${page > 0} ? 'arrow' : 'arrow disabled'" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria})}">
+                        <a class="icon-link btn" th:classappend="${page > 0} ? 'arrow' : 'arrow disabled'" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria}, sort=${sort})}">
                           <i class="fa-solid fa-angle-left"></i>                        
                         </a>
                       </span>
@@ -99,11 +102,11 @@
               <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'">
                 <a class="page-link" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria})}">Previous</a>
               </li>
-              <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria})}" th:text="${page - 1}">1</a></li>
-              <li class="page-item"><a class="page-link" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria})}" th:text="${page}">2</a></li>
-              <li th:classappend="${page < totalPages - 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria})}"  th:text="${page + 1}">3</a></li>
+              <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria}, sort=${sort})}" th:text="${page - 1}">1</a></li>
+              <li class="page-item"><a class="page-link" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort=${sort})}" th:text="${page}">2</a></li>
+              <li th:classappend="${page < totalPages - 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria}, sort=${sort})}"  th:text="${page + 1}">3</a></li>
               <li th:classappend="${page < totalPages -1} ? 'page-item' : 'page-item disabled'">
-                <a class="page-link" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria})}">Next</a>
+                <a class="page-link" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria}, sort=${sort})}">Next</a>
               </li>
             </ul>
           </nav>

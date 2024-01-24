@@ -74,7 +74,7 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public Page<Book> findByCriteria(String context, String criteria, Pageable pageable) {
+    public Page<Book> findByCriteria(String context, String criteria, String sort, Pageable pageable) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Book> query = cb.createQuery(Book.class);
         Root<Book> root = query.from(Book.class);
@@ -84,6 +84,13 @@ public class BookService {
           query.where(rootPredicates);
         }
 
+        if (sort != null) {
+          switch (sort) {
+              case "title", "author" -> query.orderBy(cb.asc(root.get(sort)));
+              case "published_year", "average_rating" -> query.orderBy(cb.desc(root.get(sort)));
+          }
+        }
+        
         query.distinct(true);
 
         TypedQuery<Book> typedQuery = em.createQuery(query);
