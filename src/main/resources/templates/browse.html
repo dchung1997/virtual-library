@@ -26,7 +26,7 @@
                     <div class="list-group" th:each="subject: ${categories}">
                       <label class="list-group-item d-flex gap-2">
                         <input class="form-check-input flex-shrink-0" type="checkbox" th:checked="${#arrays.contains(delimitedCategories, subject.categories)}" 
-                                th:value="${subject.categories}" onclick="handleCategoriesChange(this)">
+                                th:value="${subject.categories}" onclick="handleClick(this, 'criteria')">
                         <span class="text-start" th:text="${subject.categories}">Subject</span>
                         <span class="text-end ms-auto" th:text="${subject.count}">Count</span>
                       </label>
@@ -37,35 +37,34 @@
                   <div class="filter container">
                     <span class="badge rounded-pill bg-primary" th:each="filter : ${delimitedCategories}" th:inline="text">
                          [[ ${filter} ]]
-                        <button onclick="handleCategoriesChange(this)" th:value="${filter}"><i class="fa-solid fa-x"></i></button>
+                        <button onclick="handleClick(this, 'criteria')" th:value="${filter}"><i class="fa-solid fa-x"></i></button>
                     </span>
                     <button class="reset-button" th:if="${#lists.size(delimitedCategories) gt 0}" onclick="handleReset()">Clear All</button>
                   </div>
                   <div class="sorting container">
                       <span>Sort By:</span>
                       <div class="btn-group">
-                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" th:text="${#strings.replace(#strings.capitalizeWords(sort), '_', ' ')}"
-                        >
+                        <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" th:text="${#strings.replace(#strings.capitalizeWords(sort), '_', ' ')}">
                           Relevance
                         </button>
                         <ul class="dropdown-menu">
-                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='relevance')}">Relevance</a>
-                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='title')}">Title</a>
-                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='author')}">Author</a>
-                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='published_year')}">Publication Year</a>
-                          <a class="dropdown-item" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort='average_rating')}">Average Rating</a>
+                          <button class="dropdown-item" onclick="handleClick(this, 'sort')" th:value="relevance"> Relevance </button>
+                          <button class="dropdown-item" onclick="handleClick(this, 'sort')" th:value="title"> Title </button>
+                          <button class="dropdown-item" onclick="handleClick(this, 'sort')" th:value="author"> Author </button>
+                          <button class="dropdown-item" onclick="handleClick(this, 'sort')" th:value="publication_year"> Publication Year </button>
+                          <button class="dropdown-item" onclick="handleClick(this, 'sort')" th:value="average_rating"> Average Rating </button>
                         </ul>
-                      </div>                      
+                      </div> 
                       <span class="align-right">
-                        <a class="icon-link btn" th:classappend="${page  < totalPages - 1} ? 'arrow' : 'arrow disabled'" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria}, sort=${sort})}">
+                        <button class="icon-link btn" th:classappend="${page  < totalPages - 1} ? 'arrow' : 'arrow disabled'" onclick="handleClick(this, 'page')" th:value="${page+1}">
                           <i class="fa-solid fa-angle-right"></i>                        
-                        </a>
-                      </span>                      
+                        </button>
+                      </span>                                                                   
                       <span class="align-right">
-                        <a class="icon-link btn" th:classappend="${page > 0} ? 'arrow' : 'arrow disabled'" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria}, sort=${sort})}">
+                        <button class="icon-link btn" th:classappend="${page > 0} ? 'arrow' : 'arrow disabled'"  onclick="handleClick(this, 'page')" th:value="${page-1}">
                           <i class="fa-solid fa-angle-left"></i>                        
-                        </a>
-                      </span>
+                        </button>
+                      </span>                    
                       <span class="align-right index" th:inline="text">[[${page * 20 + 1} + ' to ' + ${page * 20 + pageItems} + ' of ' + ${totalElements} + ' Results']]</span>
                   </div>
                   <div class="row">
@@ -100,19 +99,19 @@
         <nav aria-label="Book Navigation">
             <ul class="pagination justify-content-center">
               <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'">
-                <a class="page-link" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria})}">Previous</a>
+                <button class="page-link" onclick="handleClick(this, 'page')" th:value="${page-1}">Previous</button>
               </li>
-              <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/browse(page=${page - 1}, context=${context}, criteria=${criteria}, sort=${sort})}" th:text="${page - 1}">1</a></li>
-              <li class="page-item"><a class="page-link" th:href="@{/books/browse(page=${page}, context=${context}, criteria=${criteria}, sort=${sort})}" th:text="${page}">2</a></li>
-              <li th:classappend="${page < totalPages - 1} ? 'page-item' : 'page-item disabled'"><a class="page-link" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria}, sort=${sort})}"  th:text="${page + 1}">3</a></li>
+              <li th:classappend="${page > 0} ? 'page-item' : 'page-item disabled'"><button class="page-link" onclick="handleClick(this, 'page')" th:value="${page-1}" th:text="${page - 1}">1</button></li>
+              <li class="page-item"><button class="page-link" onclick="handleClick(this, 'page')" th:value="${page}" th:text="${page}">2</button></li>
+              <li th:classappend="${page < totalPages - 1} ? 'page-item' : 'page-item disabled'"><button class="page-link"  onclick="handleClick(this, 'page')" th:value="${page+1}" th:text="${page + 1}">3</button></li>
               <li th:classappend="${page < totalPages -1} ? 'page-item' : 'page-item disabled'">
-                <a class="page-link" th:href="@{/books/browse(page=${page + 1}, context=${context}, criteria=${criteria}, sort=${sort})}">Next</a>
+                <button class="page-link" onclick="handleClick(this, 'page')" th:value="${page+1}" >Next</button>
               </li>
             </ul>
           </nav>
     </footer>
     <script>
-      function handleCategoriesChange(e) {
+      function handleClick(e, str) {
         const currentUrl = new URL(window.location.href);
         const search = currentUrl.search.slice(1);
         const categories = search.split("&");
@@ -120,7 +119,8 @@
         let keyValuePairs = categories.reduce((obj, item) => {
           let [key, values] = item.split('=');
           key = decodeURIComponent(key);
-          values = decodeURIComponent(values).split("+").join(" ");;
+          values = decodeURIComponent(values).split("+").join(" ");
+
           if (key === "criteria") {
             obj[key] = values.split(",");
           } else {
@@ -129,24 +129,31 @@
           return obj;
         }, {});
 
-        const checkbox = e;
-        const value = checkbox.value;
+        const obj = e;
+        const value = obj.value;
 
-        if (keyValuePairs['criteria'] === undefined) {
-          keyValuePairs['criteria'] = value;
-        } else if (keyValuePairs['criteria'].includes(value)) {
-          const index = keyValuePairs['criteria'].indexOf(value);
-          keyValuePairs['criteria'].splice(index, 1);
+        if (str === 'criteria') {
+          if (keyValuePairs[str] === undefined) {
+            keyValuePairs[str] = [value];
+          } else if (keyValuePairs[str].includes(value)) {
+            const index = keyValuePairs['criteria'].indexOf(value);
+            keyValuePairs['criteria'].splice(index, 1);
+          } else {
+            keyValuePairs['criteria'].push(value);
+          }
         } else {
-          keyValuePairs['criteria'].push(value);
+          keyValuePairs[str] = value;
         }
 
         const baseUrl = currentUrl.origin;
         const pathUrl = currentUrl.pathname;
         const newParams = new URLSearchParams();
         for (const [index, property] of Object.entries(keyValuePairs)) {
-          newParams.append(index, property);
+          if (index !== undefined && index !== '') {
+            newParams.append(index, property);
+          }
         }        
+
         const newUrl = new URL(pathUrl + "?" + newParams.toString(), baseUrl);
         window.location.href = newUrl;
       }
