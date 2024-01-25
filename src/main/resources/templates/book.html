@@ -49,11 +49,52 @@
             </div>
             <hr/>
             <div class="row">
-                <div class="col-12 col-md-3">
-                    <h2> About </h2>
+                <h2> About </h2>
+                <div class="col-12 col-md-3"></div>
+                <div class="col">
+                    <div class="container">
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Pages:</th>
+                                    <td th:text="${book.num_pages}"></td>
+                                </tr>                                
+                                <tr>
+                                    <th scope="row">Authors:</th>
+                                    <td th:text="${book.author}"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Published Year:</th>
+                                    <td th:text="${book.published_year}"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Categories:</th>
+                                    <td th:text="${book.categories}"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">ISBN:</th>
+                                    <td th:text="${book.isbn}"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Average Rating:</th>
+                                    <td th:text="${book.average_rating}"></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Ratings Count:</th>
+                                    <td th:text="${book.ratings_count}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>                
-        </div>
+                <div class="col-12 col-md-3"></div>
+            </div>
+            <hr/>
+            <div class="row">
+                <h2> Readers also Enjoyed </h2>
+                <!-- TODO Recommendor System in Batch Job. -->
+            </div>                   
+        </div>     
     </main>
   </body>
 
