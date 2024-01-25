@@ -37,13 +37,7 @@ public class BookController {
 
     @GetMapping
     public ModelAndView findAll(Pageable pageable) {
-        ModelAndView books = new ModelAndView("books");
-        Page<Book> foundBooks = bookService.findAllBooks(pageable);
-
-        books.addObject("results", foundBooks);
-        books.addObject("page", pageable.getPageNumber());
-        books.addObject("totalPages", foundBooks.getTotalPages());    
-        return books;
+        return new ModelAndView("redirect:/books/browse");
     }
 
     @GetMapping("/browse")
