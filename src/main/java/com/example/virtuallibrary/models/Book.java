@@ -1,5 +1,7 @@
 package com.example.virtuallibrary.models;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Book {
@@ -47,7 +50,10 @@ public class Book {
 
     @Column(nullable = false)
     private boolean available;
-    
+
+    @OneToMany(mappedBy = "book")
+    private List<Recommendation> recommendations;
+
     @ManyToOne
     @JoinColumn(name = "user_id") // Specify the foreign key column
     private User currentUser; // Add the property to hold the user reference
@@ -69,6 +75,7 @@ public class Book {
         this.num_pages = num_pages;
         this.ratings_count = ratings_count;
         this.available = true;
+        this.recommendations = null;
         this.currentUser = null;
     }
 
@@ -163,7 +170,15 @@ public class Book {
     public void setAvailable(boolean available) {
         this.available = available;
     }
-    
+
+    public List<Recommendation> getRecommendations() {
+        return recommendations;
+    }
+
+    public void setRecommendations(List<Recommendation> recommendations) {
+        this.recommendations = recommendations;
+    }
+        
     public User getCurrentUser() {
         return currentUser;
     }
