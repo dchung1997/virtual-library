@@ -85,6 +85,7 @@
                               <p class="mb-0" th:text="${element.categories}">Genre</p>
                               <p class="mb-0" th:inline="text">[['Published: ' + ${element.published_year}]]</p>
                               <p class="mb-0" th:inline="text">[['Pages: ' + ${element.num_pages}]]</p>
+                              <p th:classappend="${element.available ? 'text-success' : 'text-danger'}" th:text="${element.available ? 'Available' : 'All copies in use'}">Available</p>                      
                             </div>
                           </div>                  
                         </a>            
