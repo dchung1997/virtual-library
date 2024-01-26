@@ -150,7 +150,7 @@
         const pathUrl = currentUrl.pathname;
         const newParams = new URLSearchParams();
         for (const [index, property] of Object.entries(keyValuePairs)) {
-          if (index !== undefined && index !== '' && properties !== '') {
+          if (index !== undefined && index !== '' && property !== '' && property !== undefined) {
             newParams.append(index, property);
           }
         }        
