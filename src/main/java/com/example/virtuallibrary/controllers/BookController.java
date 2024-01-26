@@ -66,20 +66,16 @@ public class BookController {
     public ModelAndView getBook(@PathVariable String isbn) {
         // TODO add error checks.
         ModelAndView bookView = new ModelAndView("book");
-        List<Book> books = bookService.findByIsbn(isbn);
-        if (books.size() > 0) {
-            Book book = books.get(0);
-            int totalBooks = books.size();
-            int available = bookService.countAvailableBooks(books);
-            RatingInfo ratingInfo = bookService.calculateRatingInfo(book);
-
-            
-            bookView.addObject("rating", ratingInfo.getWholeStars());
-            bookView.addObject("fractionalPart", ratingInfo.getFractionalPart());
-            bookView.addObject("available", available);
-            bookView.addObject("copies", totalBooks);
-            bookView.addObject("book", book);
-        }
+        Book book = bookService.findByIsbn(isbn);
+        int totalBooks = book.getTotal_copies();
+        int available = book.getAvailable_copies();
+        RatingInfo ratingInfo = bookService.calculateRatingInfo(book);
+        
+        bookView.addObject("rating", ratingInfo.getWholeStars());
+        bookView.addObject("fractionalPart", ratingInfo.getFractionalPart());
+        bookView.addObject("available", available);
+        bookView.addObject("copies", totalBooks);
+        bookView.addObject("book", book);
         return bookView;
     } 
     
@@ -90,15 +86,8 @@ public class BookController {
         ModelAndView bookView = new ModelAndView("redirect:/books/" + isbn);
 
         User user = userDetailsService.findByUserName(authentication.getName());
-        List<Book> books = bookService.findByIsbn(isbn);
-        for (int i = 0; i < books.size(); i++) {
-            Book indexBook = books.get(i);
-            if (indexBook.isAvailable()) {
-                indexBook.setAvailable(false);
-                indexBook.setCurrentUser(user);
-                bookService.updateBook(indexBook, indexBook.getId());
-            }
-        }
+        Book book = bookService.findByIsbn(isbn);
+        bookService.checkout(book, user);
 
         return bookView;
     }    

@@ -10,7 +10,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import com.example.virtuallibrary.models.Book;
 
-public interface BookRepository extends PagingAndSortingRepository<Book, Long> {
+public interface BookRepository extends PagingAndSortingRepository<Book, String> {
     List<Book> findByTitle(String title);
     List<Book> findByCategories(String categories, PageRequest pageRequest);
     @Query("SELECT b FROM Book b WHERE categories = 'Fiction' ORDER BY RANDOM()" )
@@ -19,9 +19,9 @@ public interface BookRepository extends PagingAndSortingRepository<Book, Long> {
     List<Book> findNonFictionBooks(PageRequest pageRequest);
     @Query("SELECT b FROM Book b ORDER BY RANDOM()")
     List<Book> findRandomBooks(PageRequest pageRequest);
-    void deleteById(Long id);
+    void deleteById(String id);
     Page<Book> findAll(Pageable pageable);
     Book save(Book book);
-    Book findById(Long id);
-    List<Book> findByIsbn(String isbn);
+    Book findById(String id);
+    Book findByIsbn(String isbn);
 }

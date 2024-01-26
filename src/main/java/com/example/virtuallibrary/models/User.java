@@ -26,8 +26,8 @@ public class User {
     @Column(nullable = false)    
     private String password;
 
-    @OneToMany(mappedBy = "currentUser") // Use @OneToMany in User
-    private List<Book> checkouts; // Reference the join entity
+    @OneToMany(mappedBy = "user")
+    private List<BookCheckout> checkouts; 
 
     @ManyToMany(fetch = FetchType.EAGER)   
     private Collection<Role> roles;
@@ -86,6 +86,13 @@ public class User {
         this.roles = roles;
     }
 
+    public List<BookCheckout> getCheckouts() {
+        return checkouts;
+    }
+
+    public void setCheckouts(List<BookCheckout> checkouts) {
+        this.checkouts = checkouts;
+    }
 
 
 }

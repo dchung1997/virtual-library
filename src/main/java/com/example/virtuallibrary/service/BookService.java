@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 import com.example.virtuallibrary.exceptions.BookIdMismatchException;
 import com.example.virtuallibrary.exceptions.BookNotFoundException;
 import com.example.virtuallibrary.models.Book;
+import com.example.virtuallibrary.models.BookCheckout;
 import com.example.virtuallibrary.models.CategoriesCount;
 import com.example.virtuallibrary.models.RatingInfo;
+import com.example.virtuallibrary.models.User;
+import com.example.virtuallibrary.repository.BookCheckoutRepository;
 import com.example.virtuallibrary.repository.BookRepository;
 
 import jakarta.persistence.EntityManager;
@@ -31,6 +34,9 @@ public class BookService {
     private BookRepository bookRepository;
 
     @Autowired
+    private BookCheckoutRepository bookCheckoutRepository;
+
+    @Autowired
     private EntityManager em;
 
     public Page<Book> findAllBooks(Pageable pageable) {
@@ -41,7 +47,7 @@ public class BookService {
         return bookRepository.findByTitle(bookTitle);
     }
 
-    public List<Book> findByIsbn(String isbn) {
+    public Book findByIsbn(String isbn) {
         return bookRepository.findByIsbn(isbn);
     }
 
@@ -57,17 +63,58 @@ public class BookService {
       return bookRepository.findNonFictionBooks(PageRequest.of(0, 15));
     }
 
+    public boolean checkout(Book book, User user) {
+      int available_copies = book.getAvailable_copies();
+      // TODO add error checks if user has already checked out book or if book cannot be checked out.
+      if (available_copies > 0) {
+          List<BookCheckout> checkouts = book.getCheckouts() != null ? book.getCheckouts() : new ArrayList<BookCheckout>();
+
+          boolean userHasCheckout = false;
+          for (BookCheckout c : checkouts) {
+            if (c.getUser().equals(user)) {
+                userHasCheckout = true;
+            }
+          }
+
+          if (!userHasCheckout) {
+            available_copies = available_copies - 1;
+            
+            if (available_copies == 0 ) {
+              book.setAvailable(false);
+            }
+
+            book.setAvailable_copies(available_copies);
+            BookCheckout checkout = new BookCheckout(book, user);
+  
+            bookRepository.save(book);
+            bookCheckoutRepository.save(checkout);
+          }
+          return true;
+      }
+      return false;
+    }
+
+    // public boolean returnBook(BookCheckout checkout) {
+    //     if (checkouts.contains(checkout)) {
+    //         available_copies++;
+    //         checkouts.remove(checkout);
+    //         return true;
+    //     }
+    //     return false; // Not a valid checkout record
+    // }
+
     public Book createBook(Book book) {
         return bookRepository.save(book);
     }
 
-    public void deleteBook(Long id) {
+    public void deleteBook(String id) {
         bookRepository.findById(id);
         bookRepository.deleteById(id);
     }
 
-    public Book updateBook(Book book, Long id) {
-        if (book.getId() != id) {
+    public Book updateBook(Book book, String id) {
+        System.out.println("I was called");
+        if (!book.getId().equals(id)) {
           throw new BookIdMismatchException();
         }
         bookRepository.findById(id);
@@ -176,16 +223,6 @@ public class BookService {
         return null;
       }
     }    
-
-    public int countAvailableBooks(List<Book> books) {
-      int available = 0;
-      for (int i = 0; i < books.size(); i++) {
-          if (books.get(i).isAvailable()) {
-              available += 1;
-          }
-      }      
-      return available;
-    }
 
   public RatingInfo calculateRatingInfo(Book book) {
       double rating = book.getAverage_rating();

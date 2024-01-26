@@ -32,13 +32,13 @@ public class BookAPIController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void delete(@PathVariable Long id) {
+    public void delete(@PathVariable String id) {
         bookService.deleteBook(id);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Book updateBook(@RequestBody Book book, @PathVariable Long id) {
+    public Book updateBook(@RequestBody Book book, @PathVariable String id) {
         return bookService.updateBook(book, id);
     }
 }

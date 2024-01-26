@@ -4,21 +4,14 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity
 public class Book {
  
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, length=13)
+    @Column(unique=true, nullable = false, length=13)
     private String isbn;
 
     @Column(nullable = false, length=1000)
@@ -51,19 +44,24 @@ public class Book {
     @Column(nullable = false)
     private boolean available;
 
+    @Column(nullable = false)
+    private int available_copies;
+
+    @Column(nullable = false)
+    private int total_copies;
+
+    @OneToMany(mappedBy = "book")    
+    private List<BookCheckout> checkouts;
+
     @OneToMany(mappedBy = "book")
     private List<Recommendation> recommendations;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id") // Specify the foreign key column
-    private User currentUser; // Add the property to hold the user reference
 
     public Book() {
         super();
     }
 
     public Book(String isbn, String title, String author, String categories, String thumbnail, String description,
-            int published_year, double average_rating, int num_pages, int ratings_count) {
+            int published_year, double average_rating, int num_pages, int ratings_count, int available_copies, int total_copies) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
@@ -75,12 +73,22 @@ public class Book {
         this.num_pages = num_pages;
         this.ratings_count = ratings_count;
         this.available = true;
+        this.available_copies = available_copies;
+        this.total_copies = total_copies;
         this.recommendations = null;
-        this.currentUser = null;
+        this.checkouts = null;
     }
 
-    public Long getId() {
-        return id;
+    public String getId() {
+        return isbn;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     public String getTitle() {
@@ -97,14 +105,6 @@ public class Book {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public String getIsbn() {
-        return isbn;
-    }
-
-    public void setIsbn(String isbn) {
-        this.isbn = isbn;
     }
 
     public String getCategories() {
@@ -171,6 +171,22 @@ public class Book {
         this.available = available;
     }
 
+    public int getAvailable_copies() {
+        return available_copies;
+    }
+
+    public void setAvailable_copies(int available_copies) {
+        this.available_copies = available_copies;
+    }
+
+    public int getTotal_copies() {
+        return total_copies;
+    }
+
+    public void setTotal_copies(int total_copies) {
+        this.total_copies = total_copies;
+    }
+
     public List<Recommendation> getRecommendations() {
         return recommendations;
     }
@@ -179,12 +195,12 @@ public class Book {
         this.recommendations = recommendations;
     }
         
-    public User getCurrentUser() {
-        return currentUser;
+    public List<BookCheckout> getCheckouts() {
+        return checkouts;
     }
 
-    public void setCurrentUser(User currentUser) {
-        this.currentUser = currentUser;
-    }    
+    public void setCheckouts(List<BookCheckout> checkouts) {
+        this.checkouts = checkouts;
+    }
 
 }
