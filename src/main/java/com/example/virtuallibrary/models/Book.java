@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -57,7 +58,7 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<Recommendation> recommendations;
 
-    @OneToOne(mappedBy = "book")
+    @OneToOne(mappedBy = "book", fetch = FetchType.EAGER)
     private WordVector bagOfWords;
 
     public Book() {
@@ -65,7 +66,7 @@ public class Book {
     }
 
     public Book(String isbn, String title, String author, String categories, String thumbnail, String description,
-            int published_year, double average_rating, int num_pages, int ratings_count, int available_copies, int total_copies) {
+            int published_year, double average_rating, int num_pages, int ratings_count, int available_copies, int total_copies, WordVector vector) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
@@ -79,9 +80,7 @@ public class Book {
         this.available = true;
         this.available_copies = available_copies;
         this.total_copies = total_copies;
-        this.recommendations = null;
-        this.checkouts = null;
-        this.bagOfWords = null;
+        this.bagOfWords = vector;
     }
 
     public String getId() {

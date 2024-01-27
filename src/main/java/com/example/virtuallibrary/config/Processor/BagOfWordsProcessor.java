@@ -1,4 +1,4 @@
-package com.example.virtuallibrary.config;
+package com.example.virtuallibrary.config.Processor;
 
 import java.util.Arrays;
 import java.util.HashMap;

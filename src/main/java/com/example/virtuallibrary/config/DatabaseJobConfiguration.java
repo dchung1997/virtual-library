@@ -25,7 +25,9 @@ import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.DataClassRowMapper;
@@ -33,19 +35,26 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.validation.BindException;
 
 import com.example.virtuallibrary.config.Listener.bookDataSkipListener;
+import com.example.virtuallibrary.config.Processor.BagOfWordsProcessor;
+import com.example.virtuallibrary.config.Processor.BookRecommendationProcessor;
+import com.example.virtuallibrary.config.Writer.BagOfWordsItemWriter;
+import com.example.virtuallibrary.config.Writer.RecommendationItemWriter;
 import com.example.virtuallibrary.models.BagOfWords;
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.models.Recommendation;
+import com.example.virtuallibrary.models.WordVector;
 
 @Configuration
+@ComponentScan("com.example.virtuallibrary")
 public class DatabaseJobConfiguration {
     
     @Bean
-    public Job job(JobRepository jobRepository, Step step1, Step step2) {
+    public Job job(JobRepository jobRepository, Step step1, Step step2, Step step3) {
         String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         return new JobBuilder("BookDatabaseJobConfiguration: " + dateTime, jobRepository)
         .start(step1)
         .next(step2)
+        .next(step3)
         .build();
     }    
 
@@ -66,7 +75,7 @@ public class DatabaseJobConfiguration {
     // We want to process the bag of words to write to table.
     @Bean 
     public Step step2(JobRepository jobRepository, JpaTransactionManager transactionManager, 
-                        JdbcCursorItemReader<Book> bookTableReader, ItemProcessor<Book, 
+                        @Qualifier("bookDataTableReader") JdbcCursorItemReader<Book> bookTableReader, ItemProcessor<Book, 
                         BagOfWords> bagOfWordsProcessor, ItemWriter<BagOfWords> bagOfWordsItemWriter) {
         return new StepBuilder("bagOfWordsGeneration", jobRepository)
                 .<Book,BagOfWords>chunk(100, transactionManager)
@@ -76,9 +85,9 @@ public class DatabaseJobConfiguration {
                 .build();
     }
 
-    // Step 3 Generate Recommendations from Books using Bag of Words Vectors 
+    @Bean
     public Step step3(JobRepository jobRepository, JpaTransactionManager transactionManager, 
-                        JdbcCursorItemReader<Book> bookTableReader, ItemProcessor<Book, 
+                        @Qualifier("bookVectorDataTableReader") JdbcCursorItemReader<Book> bookTableReader, ItemProcessor<Book, 
                         List<Recommendation>> bookRecommendationProcessor, ItemWriter<List<Recommendation>> recommendationItemWriter) {
         return new StepBuilder("bookRecommendation", jobRepository)
             .<Book,List<Recommendation>>chunk(100, transactionManager)
@@ -145,6 +154,7 @@ public class DatabaseJobConfiguration {
     }
 
     @Bean
+    @Qualifier("bookDataTableReader")
     public JdbcCursorItemReader<Book> bookDataTableReader(DataSource dataSource) {
         String sql = "SELECT  * FROM book";
 
@@ -156,7 +166,33 @@ public class DatabaseJobConfiguration {
                 .build();
     }
 
-    // // Composite Processor First generate hashmap then find recommendations.
+    @Bean
+    @Qualifier("bookVectorDataTableReader")
+    public JdbcCursorItemReader<Book> bookVectorDataTableReader(DataSource dataSource) {
+        String sql = "SELECT * FROM book LEFT JOIN word_vector ON book.isbn = word_vector.book_id";
+
+        return new JdbcCursorItemReaderBuilder<Book>()
+                .name("bookDataTableReader")
+                .dataSource(dataSource)
+                .sql(sql)
+                .rowMapper((rs, rowNum) -> new Book(
+                    rs.getString("isbn"),
+                    rs.getString("title"),
+                    rs.getString("author"),
+                    rs.getString("categories"),
+                    rs.getString("thumbnail"),
+                    rs.getString("description"),
+                    rs.getInt("published_year"),
+                    rs.getDouble("average_rating"),
+                    rs.getInt("num_pages"),
+                    rs.getInt("ratings_count"),
+                    rs.getInt("available_copies"),
+                    rs.getInt("total_copies"),
+                    new WordVector(rs.getLong("id"), rs.getArray("words"), rs.getArray("counts"))
+                ))
+                .build();
+    }
+
     @Bean
     public ItemProcessor<Book, BagOfWords> BagOfWordsProcessorProcessor() {
         return new BagOfWordsProcessor();
@@ -168,6 +204,18 @@ public class DatabaseJobConfiguration {
         return new BagOfWordsItemWriter(dataSource);
     }
     
+
+    @Bean
+    public ItemProcessor<Book, List<Recommendation>> bookRecommendationProcessor() {
+        return new BookRecommendationProcessor();
+    }
+
+
+    @Bean
+    public ItemWriter<List<Recommendation>> RecommendationItemWriter(DataSource dataSource) {
+        return new RecommendationItemWriter(dataSource);
+    }
+
     @Bean
     public bookDataSkipListener skipListener() {
         return new bookDataSkipListener();
