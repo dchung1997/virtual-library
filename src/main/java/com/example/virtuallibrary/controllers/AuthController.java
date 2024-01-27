@@ -7,6 +7,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.example.virtuallibrary.exceptions.UserAlreadyExistsException;
 import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.service.UserDetailsServiceImpl;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -66,7 +69,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView registerUserAccount(@ModelAttribute("user") User user) {
+    public ModelAndView registerUserAccount(@Valid @ModelAttribute("user") User user, BindingResult bindingResult) {
         // TODO: Add validation.
         String username = user.getUsername();
         String password = user.getPassword();

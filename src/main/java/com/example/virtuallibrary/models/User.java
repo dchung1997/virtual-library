@@ -12,6 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name="Users")
@@ -21,9 +23,13 @@ public class User {
     private Long id;
 
     @Column(nullable = false, unique=true)    
+    @NotBlank(message = "Username is required")
+    @Size(min = 4, max = 20, message = "Username must be between 5 and 20 characters")    
     private String username;
 
     @Column(nullable = false)    
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")    
     private String password;
 
     @OneToMany(mappedBy = "user")

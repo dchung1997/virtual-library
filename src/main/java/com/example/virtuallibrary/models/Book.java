@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Book {
@@ -56,6 +57,9 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<Recommendation> recommendations;
 
+    @OneToOne(mappedBy = "book")
+    private WordVector bagOfWords;
+
     public Book() {
         super();
     }
@@ -77,6 +81,7 @@ public class Book {
         this.total_copies = total_copies;
         this.recommendations = null;
         this.checkouts = null;
+        this.bagOfWords = null;
     }
 
     public String getId() {
@@ -203,4 +208,11 @@ public class Book {
         this.checkouts = checkouts;
     }
 
+    public WordVector getBagOfWords() {
+        return bagOfWords;
+    }
+
+    public void setBagOfWords(WordVector bagOfWords) {
+        this.bagOfWords = bagOfWords;
+    }
 }

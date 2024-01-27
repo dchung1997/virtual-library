@@ -2,6 +2,7 @@ package com.example.virtuallibrary.config;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Random;
 
 import javax.sql.DataSource;
@@ -12,7 +13,6 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
@@ -33,6 +33,7 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.validation.BindException;
 
 import com.example.virtuallibrary.config.Listener.bookDataSkipListener;
+import com.example.virtuallibrary.models.BagOfWords;
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.models.Recommendation;
 
@@ -40,16 +41,17 @@ import com.example.virtuallibrary.models.Recommendation;
 public class DatabaseJobConfiguration {
     
     @Bean
-    public Job job(JobRepository jobRepository, Step step1) {
+    public Job job(JobRepository jobRepository, Step step1, Step step2) {
         String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         return new JobBuilder("BookDatabaseJobConfiguration: " + dateTime, jobRepository)
         .start(step1)
-        // .next(step2)
+        .next(step2)
         .build();
     }    
+
     @Bean 
     public Step step1(JobRepository jobRepository, JpaTransactionManager transactionManager, 
-                        ItemReader<Book> bookDataFileReader, ItemWriter<Book> bookDataTableWriter, bookDataSkipListener skipListener) {
+                        FlatFileItemReader<Book> bookDataFileReader, JdbcBatchItemWriter<Book> bookDataTableWriter, bookDataSkipListener skipListener) {
         return new StepBuilder("fileIngesting", jobRepository)
                 .<Book, Book>chunk(100, transactionManager)
                 .reader(bookDataFileReader)
@@ -62,19 +64,30 @@ public class DatabaseJobConfiguration {
     }   
 
     // We want to process the bag of words to write to table.
-    // @Bean 
-    // public Step step2(JobRepository jobRepository, JpaTransactionManager transactionManager, 
-    //                     ItemReader<Book> bookTableReader, ItemProcessor<Book, 
-    //                     Recommendation> bookProcessor, ItemWriter<Recommendation> recommendationTableWriter) {
-    //     return new StepBuilder("bookRecommendation", jobRepository)
-    //             .<Book,Recommendation>chunk(100, transactionManager)
-    //             .reader(bookTableReader)
-    //             .processor(bookProcessor)
-    //             .writer(recommendationTableWriter)
-    //             .build();
-    // }
+    @Bean 
+    public Step step2(JobRepository jobRepository, JpaTransactionManager transactionManager, 
+                        JdbcCursorItemReader<Book> bookTableReader, ItemProcessor<Book, 
+                        BagOfWords> bagOfWordsProcessor, ItemWriter<BagOfWords> bagOfWordsItemWriter) {
+        return new StepBuilder("bagOfWordsGeneration", jobRepository)
+                .<Book,BagOfWords>chunk(100, transactionManager)
+                .reader(bookTableReader)
+                .processor(bagOfWordsProcessor)
+                .writer(bagOfWordsItemWriter)
+                .build();
+    }
 
-
+    // Step 3 Generate Recommendations from Books using Bag of Words Vectors 
+    public Step step3(JobRepository jobRepository, JpaTransactionManager transactionManager, 
+                        JdbcCursorItemReader<Book> bookTableReader, ItemProcessor<Book, 
+                        List<Recommendation>> bookRecommendationProcessor, ItemWriter<List<Recommendation>> recommendationItemWriter) {
+        return new StepBuilder("bookRecommendation", jobRepository)
+            .<Book,List<Recommendation>>chunk(100, transactionManager)
+            .reader(bookTableReader)
+            .processor(bookRecommendationProcessor)
+            .writer(recommendationItemWriter)
+            .build();
+    }
+    
     @Bean
     public FlatFileItemReader<Book> bookDataFileReader() {
         DefaultLineMapper<Book> lineMapper = new DefaultLineMapper<>();
@@ -131,32 +144,29 @@ public class DatabaseJobConfiguration {
                 .build();
     }
 
-    // @Bean
-    // public JdbcCursorItemReader<Book> bookDataTableReader(DataSource dataSource) {
-    //     String sql = "SELECT  * FROM book";
+    @Bean
+    public JdbcCursorItemReader<Book> bookDataTableReader(DataSource dataSource) {
+        String sql = "SELECT  * FROM book";
 
-    //     return new JdbcCursorItemReaderBuilder<Book>()
-    //             .name("bookDataTableReader")
-    //             .dataSource(dataSource)
-    //             .sql(sql)
-    //             .rowMapper(new DataClassRowMapper<Book>(Book.class))
-    //             .build();
-    // }
+        return new JdbcCursorItemReaderBuilder<Book>()
+                .name("bookDataTableReader")
+                .dataSource(dataSource)
+                .sql(sql)
+                .rowMapper(new DataClassRowMapper<Book>(Book.class))
+                .build();
+    }
 
     // // Composite Processor First generate hashmap then find recommendations.
-    
+    @Bean
+    public ItemProcessor<Book, BagOfWords> BagOfWordsProcessorProcessor() {
+        return new BagOfWordsProcessor();
+    }
 
-    // @Bean
-    // public JdbcBatchItemWriter<Recommendation> recommendationTableWriter(DataSource dataSource) {
-    //     String sql = "insert into Recommendation(book, recommendedBook) " +  
-    //                     "values(:book, :recommendedBook)";
 
-    //     return new JdbcBatchItemWriterBuilder<Recommendation>()
-    //             .dataSource(dataSource)
-    //             .sql(sql)
-    //             .beanMapped()
-    //             .build();
-    // }
+    @Bean
+    public ItemWriter<BagOfWords> BagOfWordsItemWriter(DataSource dataSource) {
+        return new BagOfWordsItemWriter(dataSource);
+    }
     
     @Bean
     public bookDataSkipListener skipListener() {

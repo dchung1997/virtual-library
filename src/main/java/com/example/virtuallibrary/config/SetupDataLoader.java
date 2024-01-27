@@ -56,7 +56,7 @@ public class SetupDataLoader implements
         Role adminRole = roleRepository.findByName("ROLE_ADMIN");
         User user = new User();
         user.setUsername("Test");
-        user.setPassword(passwordEncoder.encode("test"));
+        user.setPassword(passwordEncoder.encode("password"));
         user.setRoles(Arrays.asList(adminRole));
         user.setEnabled(true);
         userRepository.save(user);
