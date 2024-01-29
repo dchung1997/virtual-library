@@ -72,4 +72,5 @@ public class UserDetailsServiceImplTests {
         assertThrows(UserNotFoundException.class, () -> {    
             userDetailsService.findUserById(mockId);
         });
+    }
 }
