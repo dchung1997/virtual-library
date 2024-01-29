@@ -15,7 +15,7 @@ public interface BookRepository extends PagingAndSortingRepository<Book, String>
     List<Book> findByCategories(String categories, PageRequest pageRequest);
     @Query("SELECT b FROM Book b WHERE categories = 'Fiction' ORDER BY RANDOM()" )
     List<Book> findFictionBooks(PageRequest pageRequest);
-    @Query("SELECT b FROM Book b WHERE categories LIKE '%Business%' OR categories LIKE '%Self-Help%' OR categories LIKE '%Art%' OR categories LIKE '%Philosophy%' OR categories LIKE '%Psychology%' OR categories LIKE '%Sports%' OR categories LIKE '%Poetry%' OR categories LIKE '%History%' ORDER BY RANDOM()" )
+    @Query("SELECT b FROM Book b WHERE categories LIKE '%Nonfiction%' OR categories LIKE '%Business%' OR categories LIKE '%Self-Help%' OR categories LIKE '%Art%' OR categories LIKE '%Philosophy%' OR categories LIKE '%Psychology%' OR categories LIKE '%Sports%' OR categories LIKE '%Poetry%' OR categories LIKE '%History%' ORDER BY RANDOM()" )
     List<Book> findNonFictionBooks(PageRequest pageRequest);
     @Query("SELECT b FROM Book b ORDER BY RANDOM()")
     List<Book> findRandomBooks(PageRequest pageRequest);

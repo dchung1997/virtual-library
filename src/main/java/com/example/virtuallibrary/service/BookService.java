@@ -10,12 +10,14 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.example.virtuallibrary.exceptions.BookAlreadyExistsException;
 import com.example.virtuallibrary.exceptions.BookIdMismatchException;
 import com.example.virtuallibrary.exceptions.BookNotFoundException;
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.models.BookCheckout;
 import com.example.virtuallibrary.models.CategoriesCount;
 import com.example.virtuallibrary.models.RatingInfo;
+import com.example.virtuallibrary.models.Recommendation;
 import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.repository.BookCheckoutRepository;
 import com.example.virtuallibrary.repository.BookRepository;
@@ -67,11 +69,11 @@ public class BookService {
       int available_copies = book.getAvailable_copies();
       // TODO add error checks if user has already checked out book or if book cannot be checked out.
       if (available_copies > 0) {
-          List<BookCheckout> checkouts = book.getCheckouts() != null ? book.getCheckouts() : new ArrayList<BookCheckout>();
-
+          List<BookCheckout> checkouts = user.getCheckouts() != null ? user.getCheckouts() : new ArrayList<BookCheckout>();
+          
           boolean userHasCheckout = false;
           for (BookCheckout c : checkouts) {
-            if (c.getUser().equals(user)) {
+            if (c.getBook().getId().equals(book.getId())) {
                 userHasCheckout = true;
             }
           }
@@ -85,12 +87,13 @@ public class BookService {
 
             book.setAvailable_copies(available_copies);
             BookCheckout checkout = new BookCheckout(book, user);
-  
             bookRepository.save(book);
             bookCheckoutRepository.save(checkout);
+            return true;
           }
-          return true;
+          // User has already checked out book.
       }
+      // No avialable copies of book.
       return false;
     }
 
@@ -103,21 +106,36 @@ public class BookService {
     //     return false; // Not a valid checkout record
     // }
 
+    public List<Book> getBooksByRecommendations(List<Recommendation> recommendations) {
+      List<Book> books = new ArrayList<>();
+      for (Recommendation recommendation : recommendations) {
+        books.add(recommendation.getRecommendedBook());
+      }
+      return books;
+    }
+
     public Book createBook(Book book) {
+        if (bookRepository.findById(book.getId()) != null) {
+          throw new BookAlreadyExistsException();
+        }
         return bookRepository.save(book);
     }
 
     public void deleteBook(String id) {
-        bookRepository.findById(id);
+        if (bookRepository.findById(id) == null) {
+          throw new BookNotFoundException();         
+        }
         bookRepository.deleteById(id);
     }
 
     public Book updateBook(Book book, String id) {
-        System.out.println("I was called");
         if (!book.getId().equals(id)) {
+          if (bookRepository.findById(book.getId()) == null) {
+            throw new BookNotFoundException();         
+          }
           throw new BookIdMismatchException();
         }
-        bookRepository.findById(id);
+
         return bookRepository.save(book);
     }
 
