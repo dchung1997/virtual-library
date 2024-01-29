@@ -1,7 +1,6 @@
 package com.example.virtuallibrary.config;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +74,7 @@ public class SetupDataLoader implements
     }
 
     @Transactional
-    Role createRoleIfNotFound(String name, Collection<Privilege> privileges) {
+    Role createRoleIfNotFound(String name, List<Privilege> privileges) {
         Role role = roleRepository.findByName(name);
         if (role == null) {
             role = new Role(name);

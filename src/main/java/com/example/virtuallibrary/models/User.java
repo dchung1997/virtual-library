@@ -1,6 +1,5 @@
 package com.example.virtuallibrary.models;
 
-import java.util.Collection;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -36,7 +35,7 @@ public class User {
     private List<BookCheckout> checkouts; 
 
     @ManyToMany(fetch = FetchType.EAGER)   
-    private Collection<Role> roles;
+    private List<Role> roles;
         
     private boolean enabled;    
 
@@ -84,11 +83,11 @@ public class User {
         this.enabled = enabled;
     }
 
-    public Collection<Role> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Collection<Role> roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
 

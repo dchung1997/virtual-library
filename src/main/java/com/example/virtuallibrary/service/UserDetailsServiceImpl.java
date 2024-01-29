@@ -66,8 +66,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user.getId() != id) {
           throw new UserIdMismatchException();
         }
-        userRepository.findById(id)
-          .orElseThrow(UserNotFoundException::new);
+
+        if (userRepository.findById(id) == null) {
+            throw new UserNotFoundException();
+        }
+
         return userRepository.save(user);
     }
 

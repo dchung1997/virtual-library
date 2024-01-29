@@ -130,11 +130,12 @@ public class BookService {
 
     public Book updateBook(Book book, String id) {
         if (!book.getId().equals(id)) {
-          if (bookRepository.findById(book.getId()) == null) {
-            throw new BookNotFoundException();         
-          }
           throw new BookIdMismatchException();
         }
+
+        if (bookRepository.findById(book.getId()) == null) {
+          throw new BookNotFoundException();         
+        }        
 
         return bookRepository.save(book);
     }

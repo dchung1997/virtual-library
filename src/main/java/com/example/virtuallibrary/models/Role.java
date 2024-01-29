@@ -1,6 +1,6 @@
 package com.example.virtuallibrary.models;
 
-import java.util.Collection;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,10 +21,10 @@ public class Role {
     private String name;
 
     @ManyToMany(mappedBy = "roles")
-    private Collection<User> users;
+    private List<User> users;
 
     @ManyToMany
-    private Collection<Privilege> privileges;
+    private List<Privilege> privileges;
 
     public Role() {
         super();
@@ -50,11 +50,11 @@ public class Role {
         this.name = name;
     }    
 
-    public void setPrivileges(Collection<Privilege> privileges) {
+    public void setPrivileges(List<Privilege> privileges) {
         this.privileges = privileges;
     }
 
-    public Collection<Privilege> getPrivileges() {
+    public List<Privilege> getPrivileges() {
         return this.privileges;
     }
 }

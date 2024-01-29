@@ -1,6 +1,6 @@
 package com.example.virtuallibrary.models;
 
-import java.util.Collection;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +18,7 @@ public class Privilege {
     private String name;
 
     @ManyToMany(mappedBy = "privileges")
-    private Collection<Role> roles;
+    private List<Role> roles;
 
     public Privilege(String name) {
         this.name = name;
