@@ -40,7 +40,7 @@ public class SetupDataLoader implements
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
  
-        if (alreadySetup || userRepository.findByUsername("test") != null)
+        if (alreadySetup || userRepository.findByUsername("testuser") != null)
             return;
         Privilege readPrivilege
           = createPrivilegeIfNotFound("READ_PRIVILEGE");
@@ -54,7 +54,7 @@ public class SetupDataLoader implements
 
         Role adminRole = roleRepository.findByName("ROLE_ADMIN");
         User user = new User();
-        user.setUsername("Test");
+        user.setUsername("testuser");
         user.setPassword(passwordEncoder.encode("password"));
         user.setRoles(Arrays.asList(adminRole));
         user.setEnabled(true);

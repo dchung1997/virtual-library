@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import com.example.virtuallibrary.service.UserDetailsServiceImpl;
 
@@ -39,8 +40,10 @@ public class SecurityConfig {
                         expressionInterceptUrlRegistry
                                 .anyRequest()
                                 .permitAll())
-            .formLogin(form -> form.loginPage("/login").permitAll())                                
-            .logout((logout) -> logout.permitAll())                        
+            .exceptionHandling((exceptionHandling) ->
+                exceptionHandling.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+            )                    
+            .logout((logout) -> logout.permitAll())    
             .csrf(AbstractHttpConfigurer::disable);
         
         return http.build();

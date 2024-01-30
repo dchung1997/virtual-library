@@ -3,9 +3,9 @@ package com.example.virtuallibrary.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +18,8 @@ import com.example.virtuallibrary.exceptions.UserAlreadyExistsException;
 import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.service.UserDetailsServiceImpl;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 @RestController
@@ -41,19 +40,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ModelAndView loginUserAccount(@ModelAttribute("user") User user) {
-        // Make a call to service and see if it fails.
+    public ModelAndView loginUserAccount(@Valid @ModelAttribute User user, BindingResult bindingResult, HttpServletResponse response) {
         try {
             Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
             Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
             SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
-        } catch (BadCredentialsException bdcdEx) {
-            ModelAndView modelAndView = new ModelAndView("login", "user", user);
-            modelAndView.addObject("message", "Invalid Username or Password.");          
-            return modelAndView;
+        } catch (AuthenticationException ex) {
+            ModelAndView modelAndView = new ModelAndView("login", "user", new User());
+            modelAndView.addObject("message", "Invalid Username or Password.");  
+            response.setStatus(HttpStatus.BAD_REQUEST.value());                    
+            return modelAndView;            
         } catch (RuntimeException ex) {
-            ModelAndView modelAndView = new ModelAndView("login", "user", user);
-            modelAndView.addObject("message", "An unknown error has occurred.");          
+            ModelAndView modelAndView = new ModelAndView("login", "user", new User());
+            modelAndView.addObject("message", "Invalid Username or Password.");  
+            response.setStatus(HttpStatus.BAD_REQUEST.value());                    
             return modelAndView;
         }
         return new ModelAndView("redirect:/home");
@@ -68,25 +68,36 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ModelAndView registerUserAccount(@Valid @ModelAttribute("user") User user, BindingResult bindingResult) {
-        // TODO: Add validation.
+    public ModelAndView registerUserAccount(@Valid @ModelAttribute User user, BindingResult bindingResult, HttpServletResponse response) {
+        if (bindingResult.hasErrors()) {
+            ModelAndView modelAndView = new ModelAndView("register", "user", user);
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            modelAndView.addObject("errors", bindingResult.getAllErrors());               
+            return modelAndView;
+        }
+
         String username = user.getUsername();
         String password = user.getPassword();
+
         try {
             User registered = userDetailsService.createUser(user);
             Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(username, password);
             Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
-            SecurityContextHolder.getContext().setAuthentication(authenticationResponse);        
+            SecurityContextHolder.getContext().setAuthentication(authenticationResponse);   
+            response.setStatus(HttpStatus.CREATED.value());
         } catch (UserAlreadyExistsException uaeEx) {
             ModelAndView modelAndView = new ModelAndView("register", "user", user);
-            modelAndView.addObject("message", "An account with that username already exists");
+            modelAndView.addObject("message", "An account with that username already exists.");
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
             return modelAndView;
         } catch (RuntimeException ex) {
-            return new ModelAndView("register", "user", user);
+            ModelAndView modelAndView = new ModelAndView("register", "user", user);
+            modelAndView.addObject("message", "An unexpected error occurred.");
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            return modelAndView;
         }
 
-        return new ModelAndView("home");
+        return new ModelAndView("redirect:/home");
     }
     
 }
