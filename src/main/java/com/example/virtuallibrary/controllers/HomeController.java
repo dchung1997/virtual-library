@@ -11,6 +11,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.service.BookService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 public class HomeController {
     @Value("${spring.application.name}")
@@ -20,11 +22,20 @@ public class HomeController {
     private BookService bookService;
 
     @GetMapping({"/", "/home"})
-    public ModelAndView homePage() {
+    public ModelAndView homePage(HttpServletRequest request) {
         ModelAndView home = new ModelAndView("home");
+
+        String errorMessage = (String) request.getSession().getAttribute("message");
+        request.getSession().removeAttribute("message"); 
+
+        if (errorMessage != null && !errorMessage.isBlank()) {
+            home.addObject("message", errorMessage);
+        }
+        
         List<Book> randomBooks = bookService.findFifteenBooksRandom();
         List<Book> fictionalBooks = bookService.findFifteenBooksFiction();
         List<Book> nonFictionalBooks = bookService.findFifteenBooksNonFiction();
+
 
         home.addObject("random5", randomBooks.subList(0, 5));
         home.addObject("random10", randomBooks.subList(5, 10));

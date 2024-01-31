@@ -40,19 +40,22 @@ public class BookRecommendationProcessor implements ItemProcessor<Book,  List<Re
         for (WordVector vector : vectors) {
             if (bag.getId() != vector.getId()) {
                 double distance = bag.euclideanDistance(vector);
-                priorityQueue.add(new Neighbor(vector, distance));
+                // TODO: Add additional criteria here. We'll weight them based on category and author.
+                if (distance != 0) {
+                    priorityQueue.add(new Neighbor(vector, distance));
+                }
             }
         }
 
         // Generates a list of recommendations.
         List<Recommendation> recommendations = new ArrayList<>();
-        if (!priorityQueue.isEmpty()) {
-            for (int i = 0; i < 15; i++) {
-                Neighbor neighbor = priorityQueue.poll();
-                Book recommendedBook = neighbor.getVector().getBook();
-                Recommendation recommendation = new Recommendation(book, recommendedBook);
-                recommendations.add(recommendation);
-            }
+        int i = 0;
+        while (!priorityQueue.isEmpty() && i < 5) {
+            Neighbor neighbor = priorityQueue.poll();
+            Book recommendedBook = neighbor.getVector().getBook();
+            Recommendation recommendation = new Recommendation(book, recommendedBook);
+            recommendations.add(recommendation);
+            i++;
         } 
 
         return recommendations;

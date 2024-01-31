@@ -18,7 +18,9 @@
   <body>
   
     <div th:replace="~{fragments :: navbar}"></div>
-
+    <span th:if="${message != null && message != ''}">
+      <div class="alert alert-danger" th:text="${message}"></div>
+    </span>
     <main>
       <section class="jumbotron text-center py-4">
         <div class="container">

@@ -64,29 +64,45 @@ public class BookController {
 
     @GetMapping("/{isbn}")    
     public ModelAndView getBook(@PathVariable String isbn) {
-        // TODO add error checks.
         ModelAndView bookView = new ModelAndView("book");
         Book book = bookService.findByIsbn(isbn);
+        
+        if (book == null) {
+            ModelAndView error = new ModelAndView("redirect:/home");
+            error.addObject("message", "The book you were looking for does not exist");
+            return error;
+        }
+
         int totalBooks = book.getTotal_copies();
         int available = book.getAvailable_copies();
         RatingInfo ratingInfo = bookService.calculateRatingInfo(book);
         
+        List<Book> recommendationsList = bookService.getBooksByRecommendations(book.getRecommendations());
+
         bookView.addObject("rating", ratingInfo.getWholeStars());
         bookView.addObject("fractionalPart", ratingInfo.getFractionalPart());
         bookView.addObject("available", available);
         bookView.addObject("copies", totalBooks);
         bookView.addObject("book", book);
+        bookView.addObject("recommendationsList", recommendationsList);
+
         return bookView;
     } 
     
     @GetMapping("/{isbn}/hold") 
     @PreAuthorize("isAuthenticated()")
     public ModelAndView holdBook(@PathVariable String isbn, Authentication authentication) {
-        // TODO add error checks.
         ModelAndView bookView = new ModelAndView("redirect:/books/" + isbn);
 
         User user = userDetailsService.findByUserName(authentication.getName());
         Book book = bookService.findByIsbn(isbn);
+
+        if (book == null) {
+            ModelAndView error = new ModelAndView("redirect:/home");
+            error.addObject("message", "The book you were looking for does not exist");
+            return error;
+        }
+
         bookService.checkout(book, user);
 
         return bookView;
