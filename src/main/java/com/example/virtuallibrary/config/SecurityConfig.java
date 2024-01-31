@@ -41,8 +41,9 @@ public class SecurityConfig {
                                 .anyRequest()
                                 .permitAll())
             .exceptionHandling((exceptionHandling) ->
-                exceptionHandling.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
-            )                    
+                exceptionHandling.accessDeniedHandler(new RedirectLoginAccessDeniedHandler())
+                                    .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+            )                                
             .logout((logout) -> logout.permitAll())    
             .csrf(AbstractHttpConfigurer::disable);
         

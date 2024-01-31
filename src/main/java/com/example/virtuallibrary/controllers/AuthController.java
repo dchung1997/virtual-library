@@ -6,19 +6,23 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.example.virtuallibrary.exceptions.UserAlreadyExistsException;
 import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.service.UserDetailsServiceImpl;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 
@@ -32,19 +36,28 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @GetMapping("/login")
-    public ModelAndView showLoginForm() {
+    public ModelAndView showLoginForm(@SessionAttribute("message") String message) {
         ModelAndView modelAndView = new ModelAndView("login");
+        
+        if (message != null && message != "") {
+            modelAndView.addObject("message", message);
+        }
+
         User user = new User();
         modelAndView.addObject("user", user);
         return modelAndView; // Return the login form view
     }
 
     @PostMapping("/login")
-    public ModelAndView loginUserAccount(@Valid @ModelAttribute User user, BindingResult bindingResult, HttpServletResponse response) {
+    public ModelAndView loginUserAccount(@Valid @ModelAttribute User user, BindingResult bindingResult, HttpServletRequest request, HttpServletResponse response) {
         try {
             Authentication authenticationRequest = new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword());
             Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
-            SecurityContextHolder.getContext().setAuthentication(authenticationResponse);
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            securityContext.setAuthentication(authenticationResponse);
+
+            HttpSession session = request.getSession(true);
+            session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);            
         } catch (AuthenticationException ex) {
             ModelAndView modelAndView = new ModelAndView("login", "user", new User());
             modelAndView.addObject("message", "Invalid Username or Password.");  

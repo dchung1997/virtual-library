@@ -67,7 +67,6 @@ public class BookService {
 
     public boolean checkout(Book book, User user) {
       int available_copies = book.getAvailable_copies();
-      // TODO add error checks if user has already checked out book or if book cannot be checked out.
       if (available_copies > 0) {
           List<BookCheckout> checkouts = user.getCheckouts() != null ? user.getCheckouts() : new ArrayList<BookCheckout>();
           
@@ -92,6 +91,7 @@ public class BookService {
             return true;
           }
           // User has already checked out book.
+          return false;
       }
       // No avialable copies of book.
       return false;

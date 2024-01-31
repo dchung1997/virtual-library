@@ -189,6 +189,6 @@ public class BookControllerTests {
         String isbn = "9780002005883";
         mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("http://localhost/login"));
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/login"));
     }    
 }
