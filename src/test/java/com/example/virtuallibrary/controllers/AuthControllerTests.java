@@ -1,13 +1,21 @@
 package com.example.virtuallibrary.controllers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.example.virtuallibrary.models.User;
 
@@ -59,10 +67,22 @@ public class AuthControllerTests  {
         requestParams.add("username", user.getUsername());
         requestParams.add("password", user.getPassword());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/register")
                 .params(requestParams))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.model().hasErrors());
+                .andExpect(MockMvcResultMatchers.model().hasErrors())
+                .andExpect(MockMvcResultMatchers.model().attributeExists("errors"))
+                .andReturn();
+
+        ModelAndView mav = result.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+
+        List<ObjectError> errors = (List<ObjectError>) model.get("errors");
+        for (ObjectError error: errors) {
+            assertEquals("Username must be between 5 and 20 characters", error.getDefaultMessage());
+        }
+        
+
     }    
 
     @Test
@@ -73,10 +93,25 @@ public class AuthControllerTests  {
         requestParams.add("username", user.getUsername());
         requestParams.add("password", user.getPassword());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/register")
                 .params(requestParams))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.model().hasErrors());
+                .andExpect(MockMvcResultMatchers.model().hasErrors())
+                .andExpect(MockMvcResultMatchers.model().attributeExists("errors"))
+                .andReturn();
+
+        ModelAndView mav = result.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+
+        List<ObjectError> errors = (List<ObjectError>) model.get("errors");
+        for (ObjectError error: errors) {            String errorMessage = error.getDefaultMessage();
+            if (errorMessage.equals("Username must be between 5 and 20 characters")) {
+                assertEquals("Username must be between 5 and 20 characters", error.getDefaultMessage());
+            } else {
+                assertEquals("Username is required", error.getDefaultMessage());
+            }
+        }
+                                
     }    
 
     @Test
@@ -87,10 +122,20 @@ public class AuthControllerTests  {
         requestParams.add("username", user.getUsername());
         requestParams.add("password", user.getPassword());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/register")
                 .params(requestParams))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.model().hasErrors());
+                .andExpect(MockMvcResultMatchers.model().hasErrors())
+                .andExpect(MockMvcResultMatchers.model().attributeExists("errors"))
+                .andReturn();
+
+        ModelAndView mav = result.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+
+        List<ObjectError> errors = (List<ObjectError>) model.get("errors");
+        for (ObjectError error: errors) {
+            assertEquals("Password must be at least 8 characters", error.getDefaultMessage());
+        }                
     }            
 
     @Test
@@ -101,12 +146,57 @@ public class AuthControllerTests  {
         requestParams.add("username", user.getUsername());
         requestParams.add("password", user.getPassword());
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/register")
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/register")
                 .params(requestParams))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.model().hasErrors());
+                .andExpect(MockMvcResultMatchers.model().hasErrors())
+                .andExpect(MockMvcResultMatchers.model().attributeExists("errors"))
+                .andReturn();
+
+        ModelAndView mav = result.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+
+        List<ObjectError> errors = (List<ObjectError>) model.get("errors");
+        for (ObjectError error: errors) {
+            String errorMessage = error.getDefaultMessage();
+            if (errorMessage.equals("Password must be at least 8 characters")) {
+                assertEquals("Password must be at least 8 characters", error.getDefaultMessage());
+            } else {
+                assertEquals("Password is required", error.getDefaultMessage());
+            }
+        }                   
     }        
 
+    @Test
+    public void postValidationShortUsernameEmptyPasswordErrorRegister() throws Exception {
+        User user = new User("test", "");
+
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("username", user.getUsername());
+        requestParams.add("password", user.getPassword());
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/register")
+                .params(requestParams))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.model().hasErrors())
+                .andExpect(MockMvcResultMatchers.model().attributeExists("errors"))
+                .andReturn();
+
+        ModelAndView mav = result.getModelAndView();
+        Map<String, Object> model = mav.getModel();
+
+        List<ObjectError> errors = (List<ObjectError>) model.get("errors");
+        for (ObjectError error: errors) {
+            String errorMessage = error.getDefaultMessage();
+            if (errorMessage.equals("Username must be between 5 and 20 characters")) {
+                assertEquals("Username must be between 5 and 20 characters", error.getDefaultMessage());
+            } else if (errorMessage.equals("Password must be at least 8 characters")) {
+                assertEquals("Password must be at least 8 characters", error.getDefaultMessage());
+            } else {
+                assertEquals("Password is required", error.getDefaultMessage());
+            }
+        }                   
+    }            
 
     @Test
     public void postLoginRedirectHome() throws Exception {
