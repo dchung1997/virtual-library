@@ -20,10 +20,11 @@ spring.datasource.password=mysecretpassword
 ```
 * Then you will want to run the following command
 ```
-./mvnw clean package -Dmaven.test.skip=true     
+./mvnw clean package   
 ```
 * After the build is completed move to executing the program.
 * Note: We assume that you have a command line or IDE that has Maven installed.
+* Initial setup with take around 5-10 minutes for DB setup and Recommendation System.
 
 ### Executing program
 
