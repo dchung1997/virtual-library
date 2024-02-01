@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.servlet.ModelAndView;
@@ -36,7 +37,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @GetMapping("/login")
-    public ModelAndView showLoginForm(@SessionAttribute("message") String message) {
+    public ModelAndView showLoginForm(@RequestParam(required = false) String message) {
         ModelAndView modelAndView = new ModelAndView("login");
         
         if (message != null && message != "") {

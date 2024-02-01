@@ -109,10 +109,12 @@ public class BookController {
             return error;
         } catch (BookUnavailableException buEx) {
             redirectAttributes.addFlashAttribute("message", buEx.getMessage());
+            redirectAttributes.addFlashAttribute("error", "unavailable");
             return bookView;
             
         } catch (BookAlreadyCheckedOutException baeEx) {
             redirectAttributes.addFlashAttribute("message", baeEx.getMessage());
+            redirectAttributes.addFlashAttribute("error", "unavailable");
             return bookView;
         }
 

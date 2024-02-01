@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import com.example.virtuallibrary.service.UserDetailsServiceImpl;
 
@@ -40,6 +39,7 @@ public class SecurityConfig {
                         expressionInterceptUrlRegistry
                                 .anyRequest()
                                 .permitAll())
+            .formLogin((login) -> login.disable())
             .exceptionHandling((exceptionHandling) ->
                 exceptionHandling.accessDeniedHandler(new RedirectLoginAccessDeniedHandler())
                                     .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
