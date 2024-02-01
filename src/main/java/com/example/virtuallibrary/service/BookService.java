@@ -10,9 +10,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.example.virtuallibrary.exceptions.BookUnavailableException;
+import com.example.virtuallibrary.exceptions.BookAlreadyCheckedOutException;
 import com.example.virtuallibrary.exceptions.BookAlreadyExistsException;
 import com.example.virtuallibrary.exceptions.BookIdMismatchException;
 import com.example.virtuallibrary.exceptions.BookNotFoundException;
+import com.example.virtuallibrary.exceptions.NullBookException;
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.models.BookCheckout;
 import com.example.virtuallibrary.models.CategoriesCount;
@@ -65,36 +68,31 @@ public class BookService {
       return bookRepository.findNonFictionBooks(PageRequest.of(0, 15));
     }
 
-    public boolean checkout(Book book, User user) {
+    public void checkout(Book book, User user) {
+      if (book == null) {
+        throw new NullBookException("The book you were looking for does not exist.");
+      } else if (book.getAvailable_copies() == 0) {
+        throw new BookUnavailableException("The book you are trying to check out is unavailable.");
+      } 
+
       int available_copies = book.getAvailable_copies();
-      if (available_copies > 0) {
-          List<BookCheckout> checkouts = user.getCheckouts() != null ? user.getCheckouts() : new ArrayList<BookCheckout>();
-          
-          boolean userHasCheckout = false;
-          for (BookCheckout c : checkouts) {
-            if (c.getBook().getId().equals(book.getId())) {
-                userHasCheckout = true;
-            }
-          }
-
-          if (!userHasCheckout) {
-            available_copies = available_copies - 1;
-            
-            if (available_copies == 0 ) {
-              book.setAvailable(false);
-            }
-
-            book.setAvailable_copies(available_copies);
-            BookCheckout checkout = new BookCheckout(book, user);
-            bookRepository.save(book);
-            bookCheckoutRepository.save(checkout);
-            return true;
-          }
-          // User has already checked out book.
-          return false;
+      List<BookCheckout> checkouts = user.getCheckouts() != null ? user.getCheckouts() : new ArrayList<BookCheckout>();
+      for (BookCheckout c : checkouts) {
+        if (c.getBook().getId().equals(book.getId())) {
+          throw new BookAlreadyCheckedOutException("You have already checked out this book.");
+        }
       }
-      // No avialable copies of book.
-      return false;
+
+      available_copies = available_copies - 1;
+      
+      if (available_copies == 0 ) {
+        book.setAvailable(false);
+      }
+
+      book.setAvailable_copies(available_copies);
+      BookCheckout checkout = new BookCheckout(book, user);
+      bookRepository.save(book);
+      bookCheckoutRepository.save(checkout);
     }
 
     // public boolean returnBook(BookCheckout checkout) {
@@ -129,13 +127,11 @@ public class BookService {
     }
 
     public Book updateBook(Book book, String id) {
-        if (!book.getId().equals(id)) {
-          throw new BookIdMismatchException();
-        }
-
         if (bookRepository.findById(book.getId()) == null) {
           throw new BookNotFoundException();         
-        }        
+        } else if (!book.getId().equals(id)) {
+          throw new BookIdMismatchException();
+        }
 
         return bookRepository.save(book);
     }

@@ -66,6 +66,25 @@ public class Book {
     }
 
     public Book(String isbn, String title, String author, String categories, String thumbnail, String description,
+            int published_year, double average_rating, int num_pages, int ratings_count, int available_copies, int total_copies) {
+        this.isbn = isbn;
+        this.title = title;
+        this.author = author;
+        this.categories = categories;
+        this.thumbnail = thumbnail;
+        this.description = description;
+        this.published_year = published_year;
+        this.average_rating = average_rating;
+        this.num_pages = num_pages;
+        this.ratings_count = ratings_count;
+        this.available = true;
+        this.available_copies = available_copies;
+        this.total_copies = total_copies;
+        this.bagOfWords = null;
+    
+    }
+
+    public Book(String isbn, String title, String author, String categories, String thumbnail, String description,
             int published_year, double average_rating, int num_pages, int ratings_count, int available_copies, int total_copies, WordVector vector) {
         this.isbn = isbn;
         this.title = title;

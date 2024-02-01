@@ -12,7 +12,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.virtuallibrary.exceptions.BookUnavailableException;
+import com.example.virtuallibrary.exceptions.BookAlreadyCheckedOutException;
+import com.example.virtuallibrary.exceptions.NullBookException;
 import com.example.virtuallibrary.models.Book;
 import com.example.virtuallibrary.models.CategoriesCount;
 import com.example.virtuallibrary.models.RatingInfo;
@@ -63,13 +67,13 @@ public class BookController {
 
 
     @GetMapping("/{isbn}")    
-    public ModelAndView getBook(@PathVariable String isbn) {
+    public ModelAndView getBook(@PathVariable String isbn, RedirectAttributes redirectAttributes) {
         ModelAndView bookView = new ModelAndView("book");
         Book book = bookService.findByIsbn(isbn);
         
         if (book == null) {
             ModelAndView error = new ModelAndView("redirect:/home");
-            error.addObject("message", "The book you were looking for does not exist");
+            redirectAttributes.addFlashAttribute("message", "The book you were looking for does not exist.");
             return error;
         }
 
@@ -91,20 +95,38 @@ public class BookController {
     
     @GetMapping("/{isbn}/hold") 
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView holdBook(@PathVariable String isbn, Authentication authentication) {
+    public ModelAndView holdBook(@PathVariable String isbn, RedirectAttributes redirectAttributes, Authentication authentication) {
         ModelAndView bookView = new ModelAndView("redirect:/books/" + isbn);
 
         User user = userDetailsService.findByUserName(authentication.getName());
         Book book = bookService.findByIsbn(isbn);
 
-        if (book == null) {
+        try {
+            bookService.checkout(book, user);
+        } catch (NullBookException nbEx) {
             ModelAndView error = new ModelAndView("redirect:/home");
-            error.addObject("message", "The book you were looking for does not exist");
+            redirectAttributes.addFlashAttribute("message", nbEx.getMessage());
             return error;
+        } catch (BookUnavailableException buEx) {
+            redirectAttributes.addFlashAttribute("message", buEx.getMessage());
+            return bookView;
+            
+        } catch (BookAlreadyCheckedOutException baeEx) {
+            redirectAttributes.addFlashAttribute("message", baeEx.getMessage());
+            return bookView;
         }
 
-        bookService.checkout(book, user);
-
+        redirectAttributes.addFlashAttribute("message", "You have successfully checked out " + book.getTitle() + ".");        
         return bookView;
     }    
+
+    @GetMapping("/{isbn}/return")
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView returnBook(@PathVariable String isbn, Authentication authentication) {
+        ModelAndView bookView = new ModelAndView("redirect:/books/" + isbn);
+        
+
+        return bookView;
+    }
+    
 }
