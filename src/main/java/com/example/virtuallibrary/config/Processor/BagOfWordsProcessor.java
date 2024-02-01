@@ -32,13 +32,13 @@ public class BagOfWordsProcessor implements ItemProcessor<Book,  BagOfWords> {
         // 3. Remove stop words (assuming you have a list of stop words)
         Set<String> stopWords = new HashSet<>(Arrays.asList( "a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it", "no", "not", "of", "on", "or", "such", "that", "the", "their", "then", "there", "these", "they", "this", "to", "was", "will", "with")); // Add more stop words
 
-        HashMap<String, Integer> bagOfWords = new HashMap<>();
+        HashMap<String, Double> bagOfWords = new HashMap<>();
 
         for (String word : words) {
-            Integer count = bagOfWords.get(word);
+            Double count = bagOfWords.get(word);
             if (!stopWords.contains(word)) {
                 if (count == null) {
-                    count = 0;
+                    count = 0.0;
                 }
                 bagOfWords.put(word, count + 1);
             }

@@ -5,11 +5,11 @@ import java.util.HashMap;
 
 public class BagOfWords {
 
-    private HashMap<String, Integer> vector;
+    private HashMap<String, Double> vector;
     private Book book;
 
-    public BagOfWords(HashMap<String, Integer> vector, Book book) {
-        this.vector = vector;
+    public BagOfWords(HashMap<String, Double> bagOfWords, Book book) {
+        this.vector = bagOfWords;
         this.book = book;
     }
 
@@ -17,11 +17,11 @@ public class BagOfWords {
         super();
     }
 
-    public HashMap<String, Integer> getVector() {
+    public HashMap<String, Double> getVector() {
         return vector;
     }
 
-    public void setVector(HashMap<String, Integer> vector) {
+    public void setVector(HashMap<String, Double> vector) {
         this.vector = vector;
     }
 

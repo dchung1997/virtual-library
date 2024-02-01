@@ -10,6 +10,27 @@
     margin-right: 5px;
 }
 
+.carousel {
+    height: 300px;
+}
+
+.carousel-control-next-icon {
+    filter:invert(1);
+}
+
+.carousel-control-prev-icon {
+    filter: invert(1);
+}
+
+.carousel-indicators {
+    filter: invert(1);
+}
+
+.carousel-inner {
+    width: 80%;
+    margin: 0 auto;
+}
+
 @media (max-width: 768px) {
     .book-image {
         text-align: center;

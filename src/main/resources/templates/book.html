@@ -28,7 +28,8 @@
         <div class="container py-5">
             <div class="row">
                 <div class="col-12 col-md-3 book-image">
-                    <img th:src="${book.thumbnail}">
+                    <img th:if="${#strings.isEmpty(book.thumbnail)}" th:src="@{/images/placeholder.jpg}">
+                    <img th:unless="${#strings.isEmpty(book.thumbnail)}" th:src="${book.thumbnail}">                    
                     <div class="ratings">
                         <i th:each="star : ${#numbers.sequence(1,5)}"
                         th:classappend="(${star <= rating} ? 'fa-solid fa-star rating-color' : 'fa-regular fa-star')"></i>
@@ -98,7 +99,7 @@
             </div>
             <hr/>
             <div class="row">
-                <div th:replace="~{fragments :: book-carousel (name='Readers also Enjoyed', dataOne=${recommendationsList5}, dataTwo=${recommendationsList5}, dataThree=${recommendationsList5}, id='carouselRecommended')}"></div>
+                <div th:replace="~{fragments :: book-carousel (name='Readers also Enjoyed', dataOne=${recommendationsList5}, dataTwo=${recommendationsList10}, dataThree=${recommendationsList15}, id='carouselRecommended')}"></div>
             </div>                   
         </div>     
     </main>

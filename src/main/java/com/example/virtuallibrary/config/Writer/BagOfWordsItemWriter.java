@@ -25,7 +25,7 @@ public class BagOfWordsItemWriter implements ItemWriter<BagOfWords> {
         for (BagOfWords bow : chunk) {
             WordVector wv = new WordVector(bow.getVector());
             String[] vector = wv.getWords();
-            Integer[] counts = wv.getCounts();
+            Double[] counts = wv.getCounts();
             batchArgs.add(new Object[]{vector, counts, bow.getBook().getId()});
         }
         jdbcTemplate.batchUpdate("insert into WORD_VECTOR(words, counts, book_id) VALUES (?, ?, ?)", batchArgs);

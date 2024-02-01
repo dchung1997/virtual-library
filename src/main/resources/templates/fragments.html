@@ -38,7 +38,10 @@
             <div class="row py-3">
                 <div class="col" th:each="element: ${dataOne}">
                   <a class="card shadow-sm" th:attr="href='/books/' + ${element.isbn}">
-                    <img class="bd-placeholder-img card-img-top" width="100%" height="225" th:src="${element.thumbnail}"></img>
+                    <img class="card-img-top" width="100%" height="225"
+                        th:if="${#strings.isEmpty(element.thumbnail)}" th:src="@{/images/placeholder.jpg}">
+                    <img class="card-img-top" width="100%" height="225"
+                        th:unless="${#strings.isEmpty(element.thumbnail)}"  th:src="${element.thumbnail}">
                   </a>
                 </div>
               </div>
@@ -47,7 +50,10 @@
             <div class="row py-3">
                 <div class="col" th:each="element: ${dataTwo}">
                   <a class="card shadow-sm" th:attr="href='/books/' + ${element.isbn}">
-                    <img class="bd-placeholder-img card-img-top" width="100%" height="225" th:src="${element.thumbnail}"></img>
+                    <img class="card-img-top" width="100%" height="225"
+                        th:if="${#strings.isEmpty(element.thumbnail)}" th:src="@{/images/placeholder.jpg}">
+                    <img class="card-img-top" width="100%" height="225"
+                        th:unless="${#strings.isEmpty(element.thumbnail)}"  th:src="${element.thumbnail}">
                   </a>
                 </div>
               </div>
@@ -56,7 +62,10 @@
             <div class="row py-3">
                 <div class="col" th:each="element: ${dataThree}">
                   <a class="card shadow-sm" th:attr="href='/books/' + ${element.isbn}" >
-                    <img class="bd-placeholder-img card-img-top" width="100%" height="225" th:src="${element.thumbnail}"></img>
+                    <img class="card-img-top" width="100%" height="225"
+                        th:if="${#strings.isEmpty(element.thumbnail)}" th:src="@{/images/placeholder.jpg}">
+                    <img class="card-img-top" width="100%" height="225"
+                        th:unless="${#strings.isEmpty(element.thumbnail)}"  th:src="${element.thumbnail}">
                   </a>
                 </div>
               </div>

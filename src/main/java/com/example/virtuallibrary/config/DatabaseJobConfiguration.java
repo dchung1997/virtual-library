@@ -51,7 +51,7 @@ public class DatabaseJobConfiguration {
     @Bean
     public Job job(JobRepository jobRepository, Step step1, Step step2, Step step3) {
         String dateTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        return new JobBuilder("BookDatabaseJobConfiguration: " + dateTime, jobRepository)
+        return new JobBuilder("BookDatabaseJobConfiguration", jobRepository)
         .start(step1)
         .next(step2)
         .next(step3)

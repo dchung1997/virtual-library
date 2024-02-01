@@ -88,7 +88,9 @@ public class BookController {
         bookView.addObject("available", available);
         bookView.addObject("copies", totalBooks);
         bookView.addObject("book", book);
-        bookView.addObject("recommendationsList", recommendationsList);
+        bookView.addObject("recommendationsList5", recommendationsList.subList(0, 5));
+        bookView.addObject("recommendationsList10", recommendationsList.subList(5, 10));
+        bookView.addObject("recommendationsList15", recommendationsList.subList(10, 15));
 
         return bookView;
     } 

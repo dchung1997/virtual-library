@@ -24,20 +24,18 @@ public class WordVector {
     @Column(name = "words", columnDefinition = "text[]")
     private String[] words;
 
-    @Column(name = "counts", columnDefinition = "integer[]")
-    private Integer[] counts;
+    @Column(name = "counts", columnDefinition = "DOUBLE PRECISION[]")
+    private Double[] counts;
 
     @OneToOne
     @JoinColumn(name = "book_id")
     private Book book;
 
-    
-
     public WordVector() {}
 
-    public WordVector(HashMap<String, Integer> vector) {
+    public WordVector(HashMap<String, Double> vector) {
         String[] keys = vector.keySet().toArray(new String[0]);
-        Integer[] values = vector.values().toArray(new Integer[0]);
+        Double[] values = vector.values().toArray(new Double[0]);
 
         this.words = keys;
         this.counts = values;
@@ -45,16 +43,16 @@ public class WordVector {
 
     public WordVector(Long id, Array wordsArray, Array countsArray) throws SQLException {
         String[] words = (String[]) wordsArray.getArray(); ;
-        Integer[] counts = (Integer[]) countsArray.getArray(); ;
+        Double[] counts = (Double[]) countsArray.getArray(); ;
 
         this.id = id;
         this.words = words; 
         this.counts = counts;
     }
 
-    public double euclideanDistance(WordVector vector) {
+    public double euclideanDistance(WordVector vector, double max) {
         String[] vecWords = vector.getWords();
-        Integer[] vecCounts = vector.getCounts();
+        Double[] vecCounts = vector.getCounts();
 
         // Get the shared vocabulary       
         Set<String> commonVocab = new HashSet<>(Arrays.asList(this.words));
@@ -65,7 +63,8 @@ public class WordVector {
         for (String word : commonVocab) {
             int index1 = Arrays.asList(this.words).indexOf(word);
             int index2 = Arrays.asList(vecWords).indexOf(word);
-            int diff = this.counts[index1] - vecCounts[index2];
+
+            double diff =  this.counts[index1] - vecCounts[index2];
             sumSquaredDiffs += diff * diff;
         }
 
@@ -88,11 +87,11 @@ public class WordVector {
         this.words = words;
     }
 
-    public Integer[] getCounts() {
+    public Double[] getCounts() {
         return counts;
     }
 
-    public void setCounts(Integer[] counts) {
+    public void setCounts(Double[] counts) {
         this.counts = counts;
     }
 
