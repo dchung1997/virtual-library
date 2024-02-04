@@ -1,4 +1,4 @@
-package com.example.virtuallibrary.controllers;
+    package com.example.virtuallibrary.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -204,7 +204,7 @@ public class BookControllerTests {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
                 .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already checked out this book."));
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already checked out Gilead."));
     }   
 
     @Test
@@ -264,17 +264,84 @@ public class BookControllerTests {
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/login"));
     }    
 
-    // @Test
-    // @WithMockUser("testuser")
-    // public void returnBook() throws Exception {
-    //     String isbn = "9780002005883";
-    //     mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
-    //             .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-    //             .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn));
+    @Test
+    @WithMockUser("testuser")
+    public void returnBook() throws Exception {
+        String isbn = "9780002005883";
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully checked out Gilead."));
 
-    //     mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
-    //             .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-    //             .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn));        
-    // }    
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn));        
+    }    
 
+    @Test
+    public void returnNoUserBook() throws Exception {
+        String isbn = "9780002005883";
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/login"));        
+    }    
+
+    @Test
+    @WithMockUser("testuser")
+    public void returnNoBook() throws Exception {
+        String isbn = "9780002005883";
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn));        
+    }    
+
+    @Test
+    @WithMockUser("testuser")
+    public void saveBook() throws Exception {
+        String isbn = "9780002005883";
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
+
+    }    
+
+
+    @Test
+    @WithMockUser("testuser")
+    public void saveAlreadySavedBook() throws Exception {
+        String isbn = "9780002005883";
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already saved Gilead."));
+    }     
+    
+    public void saveUnavailableBook() throws Exception {
+        String isbn = "9780002005883";
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))                
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "Gilead cannot be saved as it is unavailable."));        
+    }       
+
+    @Test
+    public void saveNoUserBook() throws Exception {
+        String isbn = "9780002005883";
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/login"));
+    }    
 }
