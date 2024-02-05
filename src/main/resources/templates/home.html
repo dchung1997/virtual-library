@@ -18,9 +18,10 @@
   <body>
   
     <div th:replace="~{fragments :: navbar}"></div>
-    <div class="container">
-      <span th:if="${message != null && message != ''}">
-          <div class="alert alert-danger" th:text="${message}"></div>
+    <div th:if="${message != null && message != ''}" class="container py-5">
+      <span >
+          <div th:if="${error != null && error != ''}"  class="alert alert-danger" th:text="${message}"></div>
+          <div th:unless="${error != null && error != ''}"  class="alert alert-success" th:text="${message}"></div>
       </span>  
     </div>
     <main>

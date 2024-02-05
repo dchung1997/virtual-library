@@ -9,7 +9,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -67,8 +69,44 @@ public class BookController {
         return books;
     }
 
+    @GetMapping("/checkout")
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView checkout(HttpSession session) {
+        ModelAndView checkout = new ModelAndView("checkout");
 
-    @GetMapping("/{isbn}")    
+        List<Book> cart = (List<Book>) session.getAttribute("cart");
+        boolean available = true;
+
+        if (cart != null) {
+            for (int i = 0; i < cart.size(); i++) {
+                if (!cart.get(i).isAvailable()) {
+                    available = false;
+                }
+            }
+        } else {
+            available = false;
+        }
+
+
+        checkout.addObject("cart", cart);
+        checkout.addObject("available", available);
+
+        return checkout;
+    }    
+
+    @PostMapping("/checkout/hold")
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView checkoutBooks(@ModelAttribute List<Book> books, HttpSession session) {
+        ModelAndView checkout = new ModelAndView("redirect:/home");
+
+        List<Book> cart = (List<Book>) session.getAttribute("cart");
+        checkout.addObject("cart", cart);
+
+        return checkout;
+    }    
+
+
+    @GetMapping("/{isbn}")  
     public ModelAndView getBook(@PathVariable String isbn, RedirectAttributes redirectAttributes) {
         ModelAndView bookView = new ModelAndView("book");
         Book book = bookService.findByIsbn(isbn);

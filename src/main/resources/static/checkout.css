@@ -1,0 +1,7 @@
+a.fa-solid.fa-trash {
+    color:grey;
+}
+
+a.fa-solid.fa-trash:hover {
+    color:#dc3545;
+}
