@@ -141,7 +141,7 @@ public class BookController {
 
         try {
             cart = bookService.addToCart(book, cart, user);
-            redirectAttributes.addFlashAttribute("message", "You have successfully added" + book.getTitle() + " to your cart.");
+            redirectAttributes.addFlashAttribute("message", "You have successfully saved " + book.getTitle() + ".");
             session.setAttribute("cart", cart);
         } catch (NullBookException nbEx) {
             ModelAndView error = new ModelAndView("redirect:/home");
@@ -169,7 +169,7 @@ public class BookController {
         Book book = bookService.findByIsbn(isbn);
 
         try {
-            bookService.checkout(book, user);
+            bookService.returnBook(book, user);
             redirectAttributes.addFlashAttribute("message", "You have successfully returned" + book.getTitle() + ".");
         } catch (NullBookException nbEx) {
             ModelAndView error = new ModelAndView("redirect:/home");

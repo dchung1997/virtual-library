@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -189,7 +190,6 @@ public class BookControllerTests {
     }    
 
     @Test
-    @Transactional    
     @WithMockUser("testuser")
     public void holdAlreadyCheckedOutBook() throws Exception {
         String isbn = "9780002005883";
@@ -204,7 +204,12 @@ public class BookControllerTests {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
                 .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already checked out Gilead."));
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already checked out this book."));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn));                      
+
     }   
 
     @Test
@@ -297,8 +302,10 @@ public class BookControllerTests {
         String isbn = "9780002005883";
 
         mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn));        
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have not checked out the book."));        
     }    
 
     @Test
@@ -311,7 +318,6 @@ public class BookControllerTests {
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
                 .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
                 .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
-
     }    
 
 
@@ -320,29 +326,53 @@ public class BookControllerTests {
     @WithMockUser("testuser")
     public void saveAlreadySavedBook() throws Exception {
         String isbn = "9780002005883";
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
+        MockHttpSession session = new MockHttpSession();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).session(session))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
                 .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
                 .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).session(session))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
                 .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already saved Gilead."));
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already saved this book."));
     }     
 
     @Test
     @Transactional
-    @WithMockUser("testuser")    
+    @WithMockUser(value = "testuser", roles = {"ADMIN"})
     public void saveUnavailableBook() throws Exception {
-        String isbn = "9780002005883";
+        String isbn = "9780002005999";
+        Book book = new Book("9780002005999", "test", "test", "Fiction", "test.com", "String description",
+        2002, 3.97, 212, 333, 1, 1);
+
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("isbn", book.getId());
+        requestParams.add("title", book.getTitle());
+        requestParams.add("author", book.getAuthor());
+        requestParams.add("categories", book.getCategories());
+        requestParams.add("thumbnail", book.getThumbnail());
+        requestParams.add("description", book.getDescription());
+        requestParams.add("published_year", Integer.toString(book.getPublished_year()));
+        requestParams.add("average_rating", Double.toString(book.getAverage_rating()));
+        requestParams.add("num_pages", Integer.toString(book.getNum_pages()));
+        requestParams.add("ratings_count", Integer.toString(book.getRatings_count()));
+        requestParams.add("available_copies", Integer.toString(0));
+        requestParams.add("total_copies", Integer.toString(0));
+        requestParams.add("available", "false");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/books")
+                .params(requestParams))
+                .andExpect(MockMvcResultMatchers.status().isCreated());
+
         mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))                
                 .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "Gilead cannot be saved as it is unavailable."));        
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "The book you are trying to save is unavailable."));        
     }       
 
     @Test

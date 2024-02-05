@@ -78,7 +78,7 @@ public class BookService {
       int available_copies = book.getAvailable_copies();
       List<BookCheckout> checkouts = user.getCheckouts() != null ? user.getCheckouts() : new ArrayList<BookCheckout>();
       for (BookCheckout c : checkouts) {
-        if (c.getBook().getId().equals(book.getId())) {
+        if (c.getBook().getId().equals(book.getId()) && !c.isReturned()) {
           throw new BookAlreadyCheckedOutException("You have already checked out this book.");
         }
       }
@@ -103,9 +103,8 @@ public class BookService {
         throw new BookUnavailableException("The book you are trying to save is unavailable.");
       } 
 
-      List<BookCheckout> checkouts = user.getCheckouts() != null ? user.getCheckouts() : new ArrayList<BookCheckout>();
-      for (BookCheckout c : checkouts) {
-        if (c.getBook().getId().equals(book.getId())) {
+      for (Book c : cart) {
+        if (c.getId().equals(book.getId())) {
           throw new BookAlreadyCheckedOutException("You have already saved this book.");
         }
       }
@@ -126,8 +125,9 @@ public class BookService {
       boolean isAvailable = false;
 
       for (BookCheckout bookCheckout : books) {
-        if (checkouts.contains(bookCheckout)) {
+        if (checkouts.contains(bookCheckout) && !bookCheckout.isReturned()) {
           isAvailable = true;
+          bookCheckout.markReturned();
           bookCheckoutIndex = bookCheckout;
         }
       }
@@ -138,12 +138,10 @@ public class BookService {
 
       int available_copies = book.getAvailable_copies() + 1;
 
-      checkouts.remove(bookCheckoutIndex);
-
-      book.setCheckouts(checkouts);
+      books.remove(bookCheckoutIndex);
+      
       book.setAvailable_copies(available_copies);
       book.setAvailable(isAvailable);
-      bookCheckoutIndex.markReturned();
       
       bookRepository.save(book);
       bookCheckoutRepository.save(bookCheckoutIndex);
