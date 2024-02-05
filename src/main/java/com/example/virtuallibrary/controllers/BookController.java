@@ -1,5 +1,6 @@
 package com.example.virtuallibrary.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import com.example.virtuallibrary.models.User;
 import com.example.virtuallibrary.service.BookService;
 import com.example.virtuallibrary.service.UserDetailsServiceImpl;
 
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -124,13 +126,63 @@ public class BookController {
         return bookView;
     }    
 
+    @GetMapping("/{isbn}/save")
+    @PreAuthorize("isAuthenticated()")
+    public ModelAndView saveBook(@PathVariable String isbn, RedirectAttributes redirectAttributes, HttpSession session, Authentication authentication) {
+        ModelAndView bookView = new ModelAndView("redirect:/books/" + isbn);
+
+        User user = userDetailsService.findByUserName(authentication.getName());
+        Book book = bookService.findByIsbn(isbn);
+        List<Book> cart = (List<Book>) session.getAttribute("cart"); 
+        
+        if (cart == null) {
+            cart = new ArrayList<>();
+        }
+
+        try {
+            cart = bookService.addToCart(book, cart, user);
+            redirectAttributes.addFlashAttribute("message", "You have successfully added" + book.getTitle() + " to your cart.");
+            session.setAttribute("cart", cart);
+        } catch (NullBookException nbEx) {
+            ModelAndView error = new ModelAndView("redirect:/home");
+            redirectAttributes.addFlashAttribute("message", nbEx.getMessage());
+            return error;
+        } catch (BookUnavailableException buEx) {
+            redirectAttributes.addFlashAttribute("message", buEx.getMessage());
+            redirectAttributes.addFlashAttribute("error", "unavailable");
+            return bookView;
+        } catch (BookAlreadyCheckedOutException bacoEx) {
+            redirectAttributes.addFlashAttribute("message", bacoEx.getMessage());
+            redirectAttributes.addFlashAttribute("error", "unavailable");
+            return bookView;
+        }
+
+        return bookView;
+    }    
+
     @GetMapping("/{isbn}/return")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView returnBook(@PathVariable String isbn, Authentication authentication) {
+    public ModelAndView returnBook(@PathVariable String isbn, RedirectAttributes redirectAttributes, Authentication authentication) {
         ModelAndView bookView = new ModelAndView("redirect:/books/" + isbn);
-        
+
+        User user = userDetailsService.findByUserName(authentication.getName());
+        Book book = bookService.findByIsbn(isbn);
+
+        try {
+            bookService.checkout(book, user);
+            redirectAttributes.addFlashAttribute("message", "You have successfully returned" + book.getTitle() + ".");
+        } catch (NullBookException nbEx) {
+            ModelAndView error = new ModelAndView("redirect:/home");
+            redirectAttributes.addFlashAttribute("message", nbEx.getMessage());
+            return error;
+        } catch (BookUnavailableException buEx) {
+            redirectAttributes.addFlashAttribute("message", buEx.getMessage());
+            redirectAttributes.addFlashAttribute("error", "unavailable");
+            return bookView;
+        }
 
         return bookView;
     }
     
+
 }

@@ -265,6 +265,7 @@ public class BookControllerTests {
     }    
 
     @Test
+    @Transactional
     @WithMockUser("testuser")
     public void returnBook() throws Exception {
         String isbn = "9780002005883";
@@ -280,6 +281,7 @@ public class BookControllerTests {
     }    
 
     @Test
+    @Transactional
     public void returnNoUserBook() throws Exception {
         String isbn = "9780002005883";
 
@@ -289,6 +291,7 @@ public class BookControllerTests {
     }    
 
     @Test
+    @Transactional
     @WithMockUser("testuser")
     public void returnNoBook() throws Exception {
         String isbn = "9780002005883";
@@ -299,6 +302,7 @@ public class BookControllerTests {
     }    
 
     @Test
+    @Transactional
     @WithMockUser("testuser")
     public void saveBook() throws Exception {
         String isbn = "9780002005883";
@@ -312,6 +316,7 @@ public class BookControllerTests {
 
 
     @Test
+    @Transactional
     @WithMockUser("testuser")
     public void saveAlreadySavedBook() throws Exception {
         String isbn = "9780002005883";
@@ -327,7 +332,10 @@ public class BookControllerTests {
                 .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
                 .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already saved Gilead."));
     }     
-    
+
+    @Test
+    @Transactional
+    @WithMockUser("testuser")    
     public void saveUnavailableBook() throws Exception {
         String isbn = "9780002005883";
         mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))

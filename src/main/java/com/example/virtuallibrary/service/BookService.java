@@ -95,14 +95,60 @@ public class BookService {
       bookCheckoutRepository.save(checkout);
     }
 
-    // public boolean returnBook(BookCheckout checkout) {
-    //     if (checkouts.contains(checkout)) {
-    //         available_copies++;
-    //         checkouts.remove(checkout);
-    //         return true;
-    //     }
-    //     return false; // Not a valid checkout record
-    // }
+
+    public List<Book> addToCart(Book book, List<Book> cart, User user) {
+      if (book == null) {
+        throw new NullBookException("The book you were looking for does not exist.");
+      } else if (book.getAvailable_copies() == 0) {
+        throw new BookUnavailableException("The book you are trying to save is unavailable.");
+      } 
+
+      List<BookCheckout> checkouts = user.getCheckouts() != null ? user.getCheckouts() : new ArrayList<BookCheckout>();
+      for (BookCheckout c : checkouts) {
+        if (c.getBook().getId().equals(book.getId())) {
+          throw new BookAlreadyCheckedOutException("You have already saved this book.");
+        }
+      }
+
+      cart.add(book);
+      return cart;
+    }    
+
+    public void returnBook(Book book, User user) {
+      if (book == null) {
+        throw new NullBookException("The book you were looking for does not exist.");
+      }
+
+      List<BookCheckout> checkouts = user.getCheckouts();
+      List<BookCheckout> books = book.getCheckouts();
+
+      BookCheckout bookCheckoutIndex = null;
+      boolean isAvailable = false;
+
+      for (BookCheckout bookCheckout : books) {
+        if (checkouts.contains(bookCheckout)) {
+          isAvailable = true;
+          bookCheckoutIndex = bookCheckout;
+        }
+      }
+
+      if (!isAvailable) {
+        throw new BookUnavailableException("You have not checked out the book.");
+      }
+
+      int available_copies = book.getAvailable_copies() + 1;
+
+      checkouts.remove(bookCheckoutIndex);
+
+      book.setCheckouts(checkouts);
+      book.setAvailable_copies(available_copies);
+      book.setAvailable(isAvailable);
+      bookCheckoutIndex.markReturned();
+      
+      bookRepository.save(book);
+      bookCheckoutRepository.save(bookCheckoutIndex);
+      
+    }
 
     public List<Book> getBooksByRecommendations(List<Recommendation> recommendations) {
       List<Book> books = new ArrayList<>();
