@@ -10,8 +10,10 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
+
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -44,17 +46,7 @@ public class BookControllerTests {
     @Transactional
     public void getBrowse() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/browse")
-                .params(requestParams))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attributeExists("results"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("categories"))
-                .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("context"))
-                .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("criteria"))
-                .andExpect(MockMvcResultMatchers.model().attribute("sort", "Relevance"))
-                .andExpect(MockMvcResultMatchers.model().attribute("page", 0))
-                .andExpect(MockMvcResultMatchers.model().attribute("pageItems", 20));
+        performBrowseTest(requestParams, false, false, "Relevance", 20);
     }
 
     @Test
@@ -62,17 +54,7 @@ public class BookControllerTests {
     public void getContextBrowse() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("context", "test");
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/browse")
-                .params(requestParams))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attributeExists("results"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("categories"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("context"))
-                .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("criteria"))
-                .andExpect(MockMvcResultMatchers.model().attribute("sort", "Relevance"))
-                .andExpect(MockMvcResultMatchers.model().attribute("page", 0))
-                .andExpect(MockMvcResultMatchers.model().attribute("pageItems", 10));
+        performBrowseTest(requestParams, true, false, "Relevance", 10);
     }    
 
     @Test
@@ -80,17 +62,7 @@ public class BookControllerTests {
     public void getCriteriaBrowse() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("criteria", "Fiction");
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/browse")
-                .params(requestParams))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attributeExists("results"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("categories"))
-                .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("context"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("criteria"))
-                .andExpect(MockMvcResultMatchers.model().attribute("sort", "Relevance"))
-                .andExpect(MockMvcResultMatchers.model().attribute("page", 0))
-                .andExpect(MockMvcResultMatchers.model().attribute("pageItems", 20));
+        performBrowseTest(requestParams, false, true, "Relevance", 20);
     }       
     
     @Test
@@ -98,17 +70,7 @@ public class BookControllerTests {
     public void getSortBrowse() throws Exception {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("sort", "title");
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/browse")
-                .params(requestParams))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attributeExists("results"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("categories"))
-                .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("context"))
-                .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("criteria"))
-                .andExpect(MockMvcResultMatchers.model().attribute("sort", "title"))
-                .andExpect(MockMvcResultMatchers.model().attribute("page", 0))
-                .andExpect(MockMvcResultMatchers.model().attribute("pageItems", 20));
+        performBrowseTest(requestParams, false, false, "title", 20);
     }        
 
     @Test
@@ -117,17 +79,7 @@ public class BookControllerTests {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("sort", "title");
         requestParams.add("criteria", "Fiction");
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/browse")
-                .params(requestParams))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attributeExists("results"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("categories"))
-                .andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("context"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("criteria"))
-                .andExpect(MockMvcResultMatchers.model().attribute("sort", "title"))
-                .andExpect(MockMvcResultMatchers.model().attribute("page", 0))
-                .andExpect(MockMvcResultMatchers.model().attribute("pageItems", 20));
+        performBrowseTest(requestParams, false, true, "title", 20);
     }         
 
     @Test
@@ -137,17 +89,7 @@ public class BookControllerTests {
         requestParams.add("sort", "title");
         requestParams.add("criteria", "Fiction");
         requestParams.add("context", "test");
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/browse")
-                .params(requestParams))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.model().attributeExists("results"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("categories"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("context"))
-                .andExpect(MockMvcResultMatchers.model().attributeExists("criteria"))
-                .andExpect(MockMvcResultMatchers.model().attribute("sort", "title"))
-                .andExpect(MockMvcResultMatchers.model().attribute("page", 0))
-                .andExpect(MockMvcResultMatchers.model().attribute("pageItems", 1));
+        performBrowseTest(requestParams, true, true, "title", 1);
     }        
 
     @Test
@@ -184,34 +126,17 @@ public class BookControllerTests {
     @WithMockUser("testuser")
     public void holdBook() throws Exception {
         String isbn = "9780002005883";
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully checked out Gilead."));
+        holdBook(isbn, "You have successfully checked out Gilead.", "/books/" + isbn, null);
+
     }    
 
     @Test
     @WithMockUser("testuser")
     public void holdAlreadyCheckedOutBook() throws Exception {
         String isbn = "9780002005883";
-        // Initial checkout.
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully checked out Gilead."));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already checked out this book."));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn));                      
-
+        holdBook(isbn, "You have successfully checked out Gilead.", "/books/" + isbn, null);
+        holdBook(isbn, "You have already checked out this book.", "/books/" + isbn, null);
+        returnBook(isbn, "You have successfully returned Gilead.", "/books/" + isbn);
     }   
 
     @Test
@@ -220,32 +145,16 @@ public class BookControllerTests {
     public void holdUnavailableBook() throws Exception {
         String isbn = "9780002005999";
         Book book = new Book("9780002005999", "test", "test", "Fiction", "test.com", "String description",
-        2002, 3.97, 212, 333, 1, 1);
+        2002, 3.97, 212, 333, 0, 0);
+        book.setAvailable(false);
 
-        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("isbn", book.getId());
-        requestParams.add("title", book.getTitle());
-        requestParams.add("author", book.getAuthor());
-        requestParams.add("categories", book.getCategories());
-        requestParams.add("thumbnail", book.getThumbnail());
-        requestParams.add("description", book.getDescription());
-        requestParams.add("published_year", Integer.toString(book.getPublished_year()));
-        requestParams.add("average_rating", Double.toString(book.getAverage_rating()));
-        requestParams.add("num_pages", Integer.toString(book.getNum_pages()));
-        requestParams.add("ratings_count", Integer.toString(book.getRatings_count()));
-        requestParams.add("available_copies", Integer.toString(0));
-        requestParams.add("total_copies", Integer.toString(0));
-        requestParams.add("available", "false");
+        LinkedMultiValueMap<String, String> requestParams = createBookParams(book);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/books")
                 .params(requestParams))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "The book you are trying to check out is unavailable."));
+        holdBook(isbn, "The book you are trying to check out is unavailable.", "/books/" + isbn, null);
     }       
 
     @Test
@@ -253,12 +162,7 @@ public class BookControllerTests {
     @WithMockUser("testuser")
     public void holdInvalidBook() throws Exception {
         String isbn = "9780002005811";
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/home"))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "The book you were looking for does not exist."));                
+        holdBook(isbn, "The book you were looking for does not exist.", "/home", null);
     }    
 
     @Test
@@ -266,9 +170,7 @@ public class BookControllerTests {
     @WithAnonymousUser
     public void holdNoAuthenticationBook() throws Exception {
         String isbn = "9780002005883";
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/login"));
+        holdBook(isbn, "Please sign in to access.", "/login", null);
     }    
 
     @Test
@@ -276,25 +178,15 @@ public class BookControllerTests {
     @WithMockUser("testuser")
     public void returnBook() throws Exception {
         String isbn = "9780002005883";
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully checked out Gilead."));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn));        
+        holdBook(isbn, "You have successfully checked out Gilead.", "/books/" + isbn, null);
+        returnBook(isbn, "You have returned Gilead.", "/books/" + isbn);     
     }    
 
     @Test
     @Transactional
     public void returnNoUserBook() throws Exception {
         String isbn = "9780002005883";
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/login"));        
+        returnBook(isbn, "Please sign in to access.", "/login");       
     }    
 
     @Test
@@ -302,12 +194,7 @@ public class BookControllerTests {
     @WithMockUser("testuser")
     public void returnNoBook() throws Exception {
         String isbn = "9780002005883";
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have not checked out the book."));        
+        returnBook(isbn, "You have not checked out the book.", "/books/" + isbn);       
     }    
 
     @Test
@@ -315,11 +202,8 @@ public class BookControllerTests {
     @WithMockUser("testuser")
     public void saveBook() throws Exception {
         String isbn = "9780002005883";
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
+        MockHttpSession session = new MockHttpSession();
+        saveBook(isbn, "You have successfully saved Gilead.", null, session);    
     }    
 
 
@@ -329,18 +213,8 @@ public class BookControllerTests {
     public void saveAlreadySavedBook() throws Exception {
         String isbn = "9780002005883";
         MockHttpSession session = new MockHttpSession();
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have already saved this book."));
+        saveBook(isbn, "You have successfully saved Gilead.", null, session);    
+        saveBook(isbn, "You have already saved this book.", null, session);    
     }     
 
     @Test
@@ -348,33 +222,19 @@ public class BookControllerTests {
     @WithMockUser(value = "testuser", roles = {"ADMIN"})
     public void saveUnavailableBook() throws Exception {
         String isbn = "9780002005999";
-        Book book = new Book("9780002005999", "test", "test", "Fiction", "test.com", "String description",
-        2002, 3.97, 212, 333, 1, 1);
+        MockHttpSession session = new MockHttpSession();
 
-        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
-        requestParams.add("isbn", book.getId());
-        requestParams.add("title", book.getTitle());
-        requestParams.add("author", book.getAuthor());
-        requestParams.add("categories", book.getCategories());
-        requestParams.add("thumbnail", book.getThumbnail());
-        requestParams.add("description", book.getDescription());
-        requestParams.add("published_year", Integer.toString(book.getPublished_year()));
-        requestParams.add("average_rating", Double.toString(book.getAverage_rating()));
-        requestParams.add("num_pages", Integer.toString(book.getNum_pages()));
-        requestParams.add("ratings_count", Integer.toString(book.getRatings_count()));
-        requestParams.add("available_copies", Integer.toString(0));
-        requestParams.add("total_copies", Integer.toString(0));
-        requestParams.add("available", "false");
+        Book book = new Book("9780002005999", "test", "test", "Fiction", "test.com", "String description",
+        2002, 3.97, 212, 333, 0, 0);
+        book.setAvailable(false);
+
+        LinkedMultiValueMap<String, String> requestParams = createBookParams(book);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/books")
                 .params(requestParams))
                 .andExpect(MockMvcResultMatchers.status().isCreated());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))                
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "The book you are trying to save is unavailable."));        
+        saveBook(isbn, "The book you are trying to save is unavailable.", null, session);    
     }       
 
     @Test
@@ -391,19 +251,8 @@ public class BookControllerTests {
     public void checkoutBooks() throws Exception  {
         String isbn = "9780002005883";
         MockHttpSession session = new MockHttpSession();
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/checkout/hold").session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/home"))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfull checked out all books."));
-
+        saveBook(isbn, "You have successfully saved Gilead.", null, session);
+        checkoutBook("You have successfull checked out all books.", "/home", null, session);                
     }
 
     @Test
@@ -416,31 +265,11 @@ public class BookControllerTests {
         
         MockHttpSession session = new MockHttpSession();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
+        saveBook(isbn, "You have successfully saved Gilead.", null, session);
+        saveBook(isbn2, "You have successfully saved Spider's Web.", null, session);
+        saveBook(isbn3, "You have successfully saved The One Tree.", null, session);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn2).session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn2))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Spider's Web."));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn3).session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn3))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved The One Tree."));                
-
-                
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/checkout/hold").session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/home"))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfull checked out all books."));
-
+        checkoutBook("You have successfull checked out all books.", "/home", null, session);                
     }
 
     @Test
@@ -452,11 +281,89 @@ public class BookControllerTests {
 
         String isbn = "9780002005999";
         MockHttpSession session = new MockHttpSession();
-        MockHttpSession session2 = new MockHttpSession();
 
         Book book = new Book("9780002005999", "test", "test", "Fiction", "test.com", "String description",
         2002, 3.97, 212, 333, 1, 1);
+        book.setAvailable(true);
 
+        LinkedMultiValueMap<String, String> requestParams = createBookParams(book);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/books").with(user2Processor)
+                .params(requestParams))
+                .andExpect(MockMvcResultMatchers.status().isCreated());        
+
+        saveBook(isbn, "You have successfully saved test.", user1Processor, session);
+        holdBook(isbn, "You have successfully checked out test.", "/books/" + isbn, user2Processor);
+        checkoutBook("Unable to checkout the following books.", "/books/checkout", user1Processor, session);
+
+    } 
+
+    private ResultActions saveBook(String isbn, String message, UserRequestPostProcessor userProcessor, MockHttpSession session) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn)
+                        .with(userProcessor != null ? userProcessor : (request) -> request)// Apply userProcessor if present
+                        .session(session))
+        .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+        .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+        .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+        .andExpect(MockMvcResultMatchers.flash().attribute("message", message));
+    }
+
+    private ResultActions returnBook(String isbn, String message, String url) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/return", isbn))
+        .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+        .andExpect(MockMvcResultMatchers.redirectedUrl(url))
+        .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+        .andExpect(MockMvcResultMatchers.flash().attribute("message", message));     
+    }
+
+    private ResultActions holdBook(String isbn, String message, String url, UserRequestPostProcessor userProcessor) throws Exception {
+        return mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn)
+                        .with(userProcessor != null ? userProcessor : (request) -> request))
+        .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+        .andExpect(MockMvcResultMatchers.redirectedUrl(url))
+        .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+        .andExpect(MockMvcResultMatchers.flash().attribute("message", message));
+    } 
+    
+    private ResultActions checkoutBook(String message, String url, UserRequestPostProcessor userProcessor, MockHttpSession session) throws Exception {
+        return  mockMvc.perform(MockMvcRequestBuilders.get("/books/checkout/hold")
+                        .with(userProcessor != null ? userProcessor : (request) -> request)
+                        .session(session))
+        .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+        .andExpect(MockMvcResultMatchers.redirectedUrl(url))
+        .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+        .andExpect(MockMvcResultMatchers.flash().attribute("message", message));
+    }        
+
+    private void performBrowseTest(LinkedMultiValueMap<String, String> requestParams,
+                    boolean expectContext, boolean expectCriteria,
+                    String expectedSort, int expectedPageItems) throws Exception {
+            ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/books/browse")
+                            .params(requestParams))
+                            .andExpect(MockMvcResultMatchers.status().isOk())
+                            .andExpect(MockMvcResultMatchers.model().attributeExists("results"))
+                            .andExpect(MockMvcResultMatchers.model().attributeExists("categories"))
+                            .andExpect(MockMvcResultMatchers.model().attributeExists("sort"))
+                            .andExpect(MockMvcResultMatchers.model().attribute("page", 0))
+                            .andExpect(MockMvcResultMatchers.model().attribute("pageItems", expectedPageItems));
+
+            if (expectContext) {
+                    resultActions.andExpect(MockMvcResultMatchers.model().attributeExists("context"));
+            } else {
+                    resultActions.andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("context"));
+            }
+
+            if (expectCriteria) {
+                    resultActions.andExpect(MockMvcResultMatchers.model().attributeExists("criteria"));
+            } else {
+                    resultActions.andExpect(MockMvcResultMatchers.model().attributeDoesNotExist("criteria"));
+            }
+
+            resultActions.andExpect(MockMvcResultMatchers.model().attribute("sort", expectedSort));
+            resultActions.andExpect(MockMvcResultMatchers.model().attribute("pageItems", expectedPageItems));
+    }
+
+    private LinkedMultiValueMap<String, String> createBookParams(Book book) {
         LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
         requestParams.add("isbn", book.getId());
         requestParams.add("title", book.getTitle());
@@ -468,32 +375,9 @@ public class BookControllerTests {
         requestParams.add("average_rating", Double.toString(book.getAverage_rating()));
         requestParams.add("num_pages", Integer.toString(book.getNum_pages()));
         requestParams.add("ratings_count", Integer.toString(book.getRatings_count()));
-        requestParams.add("available_copies", Integer.toString(1));
-        requestParams.add("total_copies", Integer.toString(1));
-        requestParams.add("available", "false");
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/books").with(user2Processor).session(session2)
-                .params(requestParams))
-                .andExpect(MockMvcResultMatchers.status().isCreated());        
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).with(user1Processor).session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved test."));
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn).with(user2Processor).session(session2))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully checked out test."));
-                
-        mockMvc.perform(MockMvcRequestBuilders.get("/books/checkout/hold").with(user1Processor).session(session))
-                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/checkout"))
-                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
-                .andExpect(MockMvcResultMatchers.flash().attribute("message", "Unable to checkout the following books."));
-
+        requestParams.add("available_copies", Integer.toString(book.getAvailable_copies()));
+        requestParams.add("total_copies", Integer.toString(book.getTotal_copies()));
+        requestParams.add("available", Boolean.toString(book.isAvailable()));
+        return requestParams;
     }
-
 }

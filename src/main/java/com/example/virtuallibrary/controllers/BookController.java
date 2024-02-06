@@ -224,7 +224,7 @@ public class BookController {
 
         try {
             bookService.returnBook(book, user);
-            redirectAttributes.addFlashAttribute("message", "You have successfully returned" + book.getTitle() + ".");
+            redirectAttributes.addFlashAttribute("message", "You have successfully returned " + book.getTitle() + ".");
         } catch (NullBookException nbEx) {
             ModelAndView error = new ModelAndView("redirect:/home");
             redirectAttributes.addFlashAttribute("message", nbEx.getMessage());
