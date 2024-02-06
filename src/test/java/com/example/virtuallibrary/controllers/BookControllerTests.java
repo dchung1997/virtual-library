@@ -174,12 +174,11 @@ public class BookControllerTests {
     }    
 
     @Test
-    @Transactional
     @WithMockUser("testuser")
     public void returnBook() throws Exception {
         String isbn = "9780002005883";
         holdBook(isbn, "You have successfully checked out Gilead.", "/books/" + isbn, null);
-        returnBook(isbn, "You have returned Gilead.", "/books/" + isbn);     
+        returnBook(isbn, "You have successfully returned Gilead.", "/books/" + isbn);     
     }    
 
     @Test
