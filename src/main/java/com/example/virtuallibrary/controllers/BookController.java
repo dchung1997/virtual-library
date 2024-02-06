@@ -9,9 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
@@ -94,14 +92,32 @@ public class BookController {
         return checkout;
     }    
 
-    @PostMapping("/checkout/hold")
+    @GetMapping("/checkout/hold")
     @PreAuthorize("isAuthenticated()")
-    public ModelAndView checkoutBooks(@ModelAttribute List<Book> books, HttpSession session) {
+    public ModelAndView checkoutBooks(HttpSession session, RedirectAttributes redirectAttributes, Authentication authentication) {
         ModelAndView checkout = new ModelAndView("redirect:/home");
 
         List<Book> cart = (List<Book>) session.getAttribute("cart");
-        checkout.addObject("cart", cart);
+        List<Book> removalArray = new ArrayList<>();
+        User user = userDetailsService.findByUserName(authentication.getName());
 
+        for (Book book : cart) {
+            if (book.isAvailable()) {
+                bookService.checkout(book, user);
+                removalArray.add(book);
+            } 
+        }
+
+        cart.removeAll(removalArray);
+        session.setAttribute("cart", cart);
+
+        if (cart.size() > 0) {
+            ModelAndView error = new ModelAndView("redirect:/books/checkout");
+            redirectAttributes.addFlashAttribute("message", "Unable to checkout the following books.");
+            return error;
+        }
+
+        redirectAttributes.addFlashAttribute("message", "You have successfull checked out all books.");
         return checkout;
     }    
 

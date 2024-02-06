@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.UserRequestPostProcessor;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -382,4 +384,116 @@ public class BookControllerTests {
                 .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
                 .andExpect(MockMvcResultMatchers.redirectedUrl("/login"));
     }    
+
+    @Test
+    @Transactional
+    @WithMockUser("testuser")
+    public void checkoutBooks() throws Exception  {
+        String isbn = "9780002005883";
+        MockHttpSession session = new MockHttpSession();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/checkout/hold").session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/home"))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfull checked out all books."));
+
+    }
+
+    @Test
+    @Transactional
+    @WithMockUser("testuser")
+    public void checkoutMultipleBooks() throws Exception  {
+        String isbn = "9780002005883";
+        String isbn2 = "9780002261982";
+        String isbn3 = "9780006163831";
+        
+        MockHttpSession session = new MockHttpSession();
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Gilead."));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn2).session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn2))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved Spider's Web."));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn3).session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn3))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved The One Tree."));                
+
+                
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/checkout/hold").session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/home"))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfull checked out all books."));
+
+    }
+
+    @Test
+    @Transactional
+    public void checkoutUnsuccessfulBook() throws Exception  {
+
+        UserRequestPostProcessor user1Processor = user("testuser3").roles("USER");
+        UserRequestPostProcessor user2Processor = user("testuser").roles("ADMIN");
+
+        String isbn = "9780002005999";
+        MockHttpSession session = new MockHttpSession();
+        MockHttpSession session2 = new MockHttpSession();
+
+        Book book = new Book("9780002005999", "test", "test", "Fiction", "test.com", "String description",
+        2002, 3.97, 212, 333, 1, 1);
+
+        LinkedMultiValueMap<String, String> requestParams = new LinkedMultiValueMap<>();
+        requestParams.add("isbn", book.getId());
+        requestParams.add("title", book.getTitle());
+        requestParams.add("author", book.getAuthor());
+        requestParams.add("categories", book.getCategories());
+        requestParams.add("thumbnail", book.getThumbnail());
+        requestParams.add("description", book.getDescription());
+        requestParams.add("published_year", Integer.toString(book.getPublished_year()));
+        requestParams.add("average_rating", Double.toString(book.getAverage_rating()));
+        requestParams.add("num_pages", Integer.toString(book.getNum_pages()));
+        requestParams.add("ratings_count", Integer.toString(book.getRatings_count()));
+        requestParams.add("available_copies", Integer.toString(1));
+        requestParams.add("total_copies", Integer.toString(1));
+        requestParams.add("available", "false");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/books").with(user2Processor).session(session2)
+                .params(requestParams))
+                .andExpect(MockMvcResultMatchers.status().isCreated());        
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/save", isbn).with(user1Processor).session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully saved test."));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/{isbn}/hold", isbn).with(user2Processor).session(session2))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/" + isbn))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "You have successfully checked out test."));
+                
+        mockMvc.perform(MockMvcRequestBuilders.get("/books/checkout/hold").with(user1Processor).session(session))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrl("/books/checkout"))
+                .andExpect(MockMvcResultMatchers.flash().attributeExists("message"))
+                .andExpect(MockMvcResultMatchers.flash().attribute("message", "Unable to checkout the following books."));
+
+    }
+
 }
