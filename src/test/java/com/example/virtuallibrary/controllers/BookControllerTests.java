@@ -251,7 +251,7 @@ public class BookControllerTests {
         String isbn = "9780002005883";
         MockHttpSession session = new MockHttpSession();
         saveBook(isbn, "You have successfully saved Gilead.", null, session);
-        checkoutBook("You have successfull checked out all books.", "/home", null, session);                
+        checkoutBook("You have successfully checked out all books.", "/home", null, session);                
     }
 
     @Test
@@ -268,7 +268,7 @@ public class BookControllerTests {
         saveBook(isbn2, "You have successfully saved Spider's Web.", null, session);
         saveBook(isbn3, "You have successfully saved The One Tree.", null, session);
 
-        checkoutBook("You have successfull checked out all books.", "/home", null, session);                
+        checkoutBook("You have successfully checked out all books.", "/home", null, session);                
     }
 
     @Test

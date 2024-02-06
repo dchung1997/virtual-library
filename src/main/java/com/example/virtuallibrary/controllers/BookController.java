@@ -117,7 +117,7 @@ public class BookController {
             return error;
         }
 
-        redirectAttributes.addFlashAttribute("message", "You have successfull checked out all books.");
+        redirectAttributes.addFlashAttribute("message", "You have successfully checked out all books.");
         return checkout;
     }    
 
