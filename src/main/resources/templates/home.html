@@ -30,6 +30,7 @@
           <h1 class="jumbotron-heading">Subtext Library</h1>
           <p class="lead text-muted">6 West 5th Street, St. Paul, MN 55102 | 651-493-2791 | subtextinfo@gmail.com</p>
           <div style="text-align:center"><img alt="" height="" src="https://cdn1.bookmanager.com/i/8039534/stb_exterior.jpg" style="width: 100%; height: auto; max-width: 379px; max-height: 472px;" width=""></div>
+          <!-- We probably want something here to show the books of the user. -->
         </div>
       </section>
       <section class="registration-hero" sec:authorize="!isFullyAuthenticated()" background>
@@ -49,6 +50,51 @@
           </div>
         </div>        
       </section>
+      <section th:if="${overdue}" class="bg-danger" sec:authorize="isFullyAuthenticated()" background >
+        <div class="container col-xxl-8 px-4 py-4">
+          <div class="row flex-md-row-reverse align-items-center g-5 py-5">
+            <div class="col-md-6 d-none d-md-block">
+              <img th:src="@{/images/book.svg}" class="d-block mx-lg-auto img-fluid" alt="Library Card" width="150" height="150" loading="lazy">
+            </div>
+            <div class="col-md-6">
+              <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Overdue Book</h1>
+              <p class="lead">Looks like you have an overdue book. Make sure to return it soon.</p>
+            </div>
+          </div>
+        </div>        
+      </section>      
+      <section th:if="${almostdue}" class="bg-warning" sec:authorize="isFullyAuthenticated()" background >
+        <div class="container col-xxl-8 px-4 py-4">
+          <div class="row flex-md-row-reverse align-items-center g-5 py-5">
+            <div class="col-md-6 d-none d-md-block">
+              <img th:src="@{/images/book.svg}" class="d-block mx-lg-auto img-fluid" alt="Library Card" width="150" height="150" loading="lazy">
+            </div>
+            <div class="col-md-6">
+              <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Reminder</h1>
+              <p class="lead">Just a heads up looks like its almost time to return one of your books.</p>
+              <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a type="button" class="btn btn-light btn-lg px-4 me-md-2" href="/books/browse">Browse</a>
+              </div>
+            </div>
+          </div>
+        </div>        
+      </section>   
+      <section th:if="${!overdue && !almostdue}" class="bg-primary" sec:authorize="isFullyAuthenticated()" background >
+        <div class="container col-xxl-8 px-4 py-4">
+          <div class="row flex-md-row-reverse align-items-center g-5 py-5">
+            <div class="col-md-6 d-none d-md-block">
+              <img th:src="@{/images/book.svg}" class="d-block mx-lg-auto img-fluid" alt="Library Card" width="150" height="150" loading="lazy">
+            </div>
+            <div class="col-md-6">
+              <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">Browse & Explore</h1>
+              <p class="lead">Looking for something new? Checkout everything new and exciting we have in our catalogue.</p>
+              <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a type="button" class="btn btn-light btn-lg px-4 me-md-2" href="/books/browse">Browse</a>
+              </div>
+            </div>
+          </div>
+        </div>        
+      </section>                
       <section>
         <div class="container py-4">
           <div th:replace="~{fragments :: book-carousel (name='Editor\'s Choice', dataOne=${random5}, dataTwo=${random10}, dataThree=${random15}, id='carouselChoice')}"></div>

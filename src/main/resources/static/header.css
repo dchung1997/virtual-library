@@ -4,10 +4,23 @@
     border: none;
 }
 
+.fa-circle-user {
+    color:white;
+}
+
+.fa-circle-user:hover {
+    color:grey;
+}
+
+
 .ms-n5 {
     margin-left: -40px;
 }
 
 .input-group input.form-control  {
     border-radius: 5px!important;
+}
+
+.user.dropdown ul {
+    margin-bottom: 0;
 }
