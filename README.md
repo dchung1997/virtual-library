@@ -4,7 +4,7 @@ A Virtual Book Library built with Spring Boot.
 
 ## Description
 
-Virtual Library is an online book library. It is a monolothic three tier application that supports various features that any traditional online library would have such as browsing, checkout, and searching. It supports login with Spring Security and utilizes Spring Data JPA along with PostgreSQL to load data. The front end of this project is handled by Thymeleaf and utilizes Spring Batch to load Book data into the DB. 
+Virtual Library is an online book library. It is a monolothic three tier application that supports various features that any traditional online library would have such as browsing, checkout, and searching. It supports login with Spring Security and utilizes Spring Data JPA along with PostgreSQL to load data. The front end of this project is handled by Thymeleaf and utilizes Spring Batch to load Book data into the DB which it then uses to generate 100k Book Recommendations.
 
 ## Getting Started
 
